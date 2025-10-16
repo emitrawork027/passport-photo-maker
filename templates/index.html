@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free AI Background Remover - फ्री में फोटो की बैकग्राउंड हटाएं। पासपोर्ट साइज फोटो भी बनाएं।">
+    <meta name="keywords" content="background remover, remove bg, passport photo maker, फ्री बैकग्राउंड रिमूवर, पासपोर्ट फोटो">
+    <meta name="author" content="Free Passport Maker">
+    <title>Free Background Remover & Passport Photo Maker - AI Powered</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/8d2de9dd-fd7a-46db-a112-6e40a0aea5bf.png" alt="Logo" class="logo-img">
+                    <h1 data-en="Free Passport Maker" data-hi="फ्री पासपोर्ट मेकर">Free Passport Maker</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="/" class="active" data-en="Home" data-hi="होम">Home</a></li>
+                    <li><a href="/passport-maker" data-en="Passport Maker" data-hi="पासपोर्ट मेकर">Passport Maker</a></li>
+                    <li><a href="/about" data-en="About Us" data-hi="हमारे बारे में">About Us</a></li>
+                    <li><a href="/contact" data-en="Contact" data-hi="संपर्क करें">Contact</a></li>
+                </ul>
+                <div class="top-controls">
+                    <button class="control-btn theme-btn" id="themeBtn" title="Change Theme">🎨</button>
+                    <button class="control-btn lang-btn" id="langBtn" title="Change Language">🌐 EN</button>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Theme Selector Modal -->
+        <div class="theme-modal" id="themeModal">
+            <div class="theme-options">
+                <button class="theme-option" data-theme="default" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">Default</button>
+                <button class="theme-option" data-theme="ocean" style="background: linear-gradient(135deg, #0ea5e9, #06b6d4);">Ocean</button>
+                <button class="theme-option" data-theme="sunset" style="background: linear-gradient(135deg, #f97316, #ef4444);">Sunset</button>
+                <button class="theme-option" data-theme="forest" style="background: linear-gradient(135deg, #10b981, #059669);">Forest</button>
+                <button class="theme-option" data-theme="royal" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">Royal</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Ad Space Top -->
+        <div class="ad-container ad-top">
+            <div class="ad-placeholder">
+                <!-- Google AdSense Code Here -->
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                     data-ad-slot="XXXXXXXXXX"
+                     data-ad-format="auto"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </div>
+
+        <section class="hero">
+            <div class="container">
+                <h1 class="hero-title" data-en="Remove Background from Images" data-hi="फोटो की बैकग्राउंड हटाएं">Remove Background from Images</h1>
+                <p class="hero-subtitle" data-en="AI-Powered Background Removal in Seconds - 100% Free" data-hi="AI से बैकग्राउंड हटाएं - बिल्कुल फ्री">AI-Powered Background Removal in Seconds - 100% Free</p>
+                
+                <div class="passport-btn-container">
+                    <a href="/passport-maker" class="btn-passport-maker" data-en="📸 Create Passport Photo" data-hi="📸 पासपोर्ट फोटो बनाएं">📸 Create Passport Photo</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="upload-section">
+            <div class="container">
+                <!-- Quality Selector -->
+                <div class="quality-selector">
+                    <label data-en="Image Quality:" data-hi="इमेज क्वालिटी:">Image Quality:</label>
+                    <select id="qualitySelect">
+                        <option value="high" data-en="High Quality (Original Size)" data-hi="उच्च गुणवत्ता (मूल आकार)">High Quality (Original Size)</option>
+                        <option value="medium" data-en="Medium Quality (75%)" data-hi="मध्यम गुणवत्ता (75%)">Medium Quality (75%)</option>
+                        <option value="low" data-en="Low Quality (50%)" data-hi="निम्न गुणवत्ता (50%)">Low Quality (50%)</option>
+                    </select>
+                </div>
+
+                <div class="upload-box" id="uploadBox">
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                    <div class="upload-content">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <h3 data-en="Upload Image" data-hi="फोटो अपलोड करें">Upload Image</h3>
+                        <p data-en="Click or drag and drop your image here" data-hi="यहाँ क्लिक करें या फोटो ड्रैग करें">Click or drag and drop your image here</p>
+                        <p class="file-info" data-en="PNG, JPG, JPEG up to 16MB" data-hi="PNG, JPG, JPEG - 16MB तक">PNG, JPG, JPEG up to 16MB</p>
+                        <button class="btn-primary" onclick="document.getElementById('imageInput').click()" data-en="Select Image" data-hi="फोटो चुनें">Select Image</button>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p data-en="Processing your image..." data-hi="आपकी फोटो प्रोसेस हो रही है...">Processing your image...</p>
+                </div>
+
+                <div class="result-section" id="resultSection" style="display: none;">
+                    <!-- Ad Space Sidebar -->
+                    <div class="ad-sidebar">
+                        <div class="ad-placeholder">
+                            <!-- Google AdSense Vertical Ad -->
+                            <ins class="adsbygoogle"
+                                 style="display:block"
+                                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                                 data-ad-slot="XXXXXXXXXX"
+                                 data-ad-format="vertical"></ins>
+                        </div>
+                    </div>
+
+                    <div class="image-comparison">
+                        <div class="image-box">
+                            <h3 data-en="Original" data-hi="मूल फोटो">Original</h3>
+                            <img id="originalImage" alt="Original">
+                        </div>
+                        <div class="image-box">
+                            <h3 data-en="Background Removed" data-hi="बैकग्राउंड हटाई गई">Background Removed</h3>
+                            <img id="processedImage" alt="Processed">
+                        </div>
+                    </div>
+                    
+                    <div class="download-buttons">
+                        <button class="btn-download" onclick="downloadImage('png')" data-en="Download PNG" data-hi="PNG डाउनलोड करें">Download PNG</button>
+                        <button class="btn-download" onclick="downloadImage('jpg')" data-en="Download JPG" data-hi="JPG डाउनलोड करें">Download JPG</button>
+                        <button class="btn-secondary" onclick="resetUploader()" data-en="Process Another Image" data-hi="दूसरी फोटो प्रोसेस करें">Process Another Image</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ad Space Bottom -->
+        <div class="ad-container ad-bottom">
+            <div class="ad-placeholder">
+                <!-- Google AdSense Code -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                     data-ad-slot="XXXXXXXXXX"
+                     data-ad-format="auto"></ins>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+<section class="features" id="features">
+    <div class="container">
+        <h2 data-en="Why Choose Us?" data-hi="हमें क्यों चुनें?">Why Choose Us?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3 data-en="Lightning Fast" data-hi="बिजली की तरह तेज़">Lightning Fast</h3>
+                <p data-en="Remove backgrounds in seconds with AI technology" data-hi="AI तकनीक से सेकंड में बैकग्राउंड हटाएं">Remove backgrounds in seconds with AI technology</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💯</div>
+                <h3 data-en="High Quality" data-hi="उच्च गुणवत्ता">High Quality</h3>
+                <p data-en="Professional results with sharp edges" data-hi="तेज धार के साथ प्रोफेशनल परिणाम">Professional results with sharp edges</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🆓</div>
+                <h3 data-en="Completely Free" data-hi="पूरी तरह से मुफ़्त">Completely Free</h3>
+                <p data-en="No watermarks, unlimited usage" data-hi="कोई वॉटरमार्क नहीं, असीमित उपयोग">No watermarks, unlimited usage</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 data-en="Privacy First" data-hi="गोपनीयता प्रथम">Privacy First</h3>
+                <p data-en="Your images are processed securely" data-hi="आपकी इमेज सुरक्षित रूप से प्रोसेस होती हैं">Your images are processed securely</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3 data-en="Mobile Friendly" data-hi="मोबाइल फ्रेंडली">Mobile Friendly</h3>
+                <p data-en="Works on all devices" data-hi="सभी डिवाइस पर काम करता है">Works on all devices</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📸</div>
+                <h3 data-en="Passport Photos" data-hi="पासपोर्ट फोटो">Passport Photos</h3>
+                <p data-en="Create professional passport photos" data-hi="प्रोफेशनल पासपोर्ट फोटो बनाएं">Create professional passport photos</p>
+            </div>
+        </div>
+        
+        <!-- Copyright Footer Inside Features -->
+        <div class="features-footer">
+            <p>&copy; 2025 Free Passport Maker. <span data-en="All rights reserved." data-hi="सर्वाधिकार सुरक्षित।">All rights reserved.</span></p>
+        </div>
+    </div>
+</section>
+    </main>
+<!--
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Free Passport Maker. <span data-en="All rights reserved." data-hi="सर्वाधिकार सुरक्षित।">All rights reserved.</span></p>
+        </div>
+    </footer> -->
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/language.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

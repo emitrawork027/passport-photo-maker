@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Free Passport Maker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/8d2de9dd-fd7a-46db-a112-6e40a0aea5bf.png" alt="Logo" class="logo-img">
+                    <h1 data-en="Free Passport Maker" data-hi="फ्री पासपोर्ट मेकर">Free Passport Maker</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="/" data-en="Home" data-hi="होम">Home</a></li>
+                    <li><a href="/passport-maker" data-en="Passport Maker" data-hi="पासपोर्ट मेकर">Passport Maker</a></li>
+                    <li><a href="/about" data-en="About Us" data-hi="हमारे बारे में">About Us</a></li>
+                    <li><a href="/contact" class="active" data-en="Contact" data-hi="संपर्क करें">Contact</a></li>
+                </ul>
+                <div class="top-controls">
+                    <button class="control-btn theme-btn" id="themeBtn">🎨</button>
+                    <button class="control-btn lang-btn" id="langBtn">🌐 HI</button>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="theme-modal" id="themeModal">
+            <div class="theme-options">
+                <button class="theme-option" data-theme="default" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">Default</button>
+                <button class="theme-option" data-theme="ocean" style="background: linear-gradient(135deg, #0ea5e9, #06b6d4);">Ocean</button>
+                <button class="theme-option" data-theme="sunset" style="background: linear-gradient(135deg, #f97316, #ef4444);">Sunset</button>
+                <button class="theme-option" data-theme="forest" style="background: linear-gradient(135deg, #10b981, #059669);">Forest</button>
+                <button class="theme-option" data-theme="royal" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">Royal</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Contact Hero -->
+        <section class="contact-hero">
+            <div class="container">
+                <h1 data-en="Contact Us" data-hi="संपर्क करें">Contact Us</h1>
+                <p data-en="We'd love to hear from you!" data-hi="हम आपसे सुनना पसंद करेंगे!">We'd love to hear from you!</p>
+            </div>
+        </section>
+
+        <!-- Contact Content -->
+        <section class="contact-content">
+            <div class="container">
+                <div class="contact-grid">
+                    <!-- Left: Contact Form -->
+                    <div class="contact-form-wrapper">
+                        <h2 data-en="Send us a message" data-hi="हमें संदेश भेजें">Send us a message</h2>
+                        <form id="contactForm" class="contact-form">
+                            <div class="form-group">
+                                <label data-en="Your Name" data-hi="आपका नाम">Your Name</label>
+                                <input type="text" id="name" required placeholder="Enter your name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label data-en="Email Address" data-hi="ईमेल पता">Email Address</label>
+                                <input type="email" id="email" required placeholder="your@email.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label data-en="Phone Number" data-hi="फोन नंबर">Phone Number</label>
+                                <input type="tel" id="phone" placeholder="+91 XXXXXXXXXX">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label data-en="Message" data-hi="संदेश">Message</label>
+                                <textarea id="message" rows="4" required placeholder="Write your message here..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn-submit" data-en="Send Message" data-hi="संदेश भेजें">Send Message</button>
+                        </form>
+                        <div id="formMessage" class="form-message"></div>
+                    </div>
+
+                    <!-- Right: Contact Info -->
+                    <div class="contact-info-wrapper">
+                        <h2 data-en="Get in Touch" data-hi="संपर्क में रहें">Get in Touch</h2>
+                        
+                        <div class="info-cards">
+                            <!-- Email -->
+                            <div class="info-card">
+                                <div class="info-icon-circle">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <div class="info-content">
+                                    <h4 data-en="Email" data-hi="ईमेल">Email</h4>
+                                    <p>support@freepassportmaker.com</p>
+                                </div>
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="info-card">
+                                <div class="info-icon-circle">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <div class="info-content">
+                                    <h4 data-en="Phone" data-hi="फोन">Phone</h4>
+                                    <p>+91 7239993939</p>
+                                </div>
+                            </div>
+
+                            <!-- Business Hours -->
+                            <div class="info-card">
+                                <div class="info-icon-circle">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <div class="info-content">
+                                    <h4 data-en="Business Hours" data-hi="कार्य समय">Business Hours</h4>
+                                    <p data-en="Monday - Saturday: 9 AM - 6 PM" data-hi="सोमवार - शनिवार: 9 AM - 6 PM">Monday - Saturday: 9 AM - 6 PM</p>
+                                </div>
+                            </div>
+
+                            <!-- Social Links -->
+                            <div class="info-card">
+                                <div class="info-icon-circle">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <div class="info-content">
+                                    <h4 data-en="Follow Us" data-hi="हमें फॉलो करें">Follow Us</h4>
+                                    <div class="social-buttons">
+                                        <a href="#" class="social-btn">Facebook</a>
+                                        <a href="#" class="social-btn">Twitter</a>
+                                        <a href="#" class="social-btn">Instagram</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="contact-footer">
+        <div class="container">
+            <p>&copy; 2025 Free Passport Maker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/contact.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/language.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

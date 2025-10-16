@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create perfect passport photos online. 12 photos per sheet at 300 DPI.">
+    <title>Passport Photo Maker - Free Passport Maker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/8d2de9dd-fd7a-46db-a112-6e40a0aea5bf.png" alt="Logo" class="logo-img">
+                    <h1 data-en="Free Passport Maker" data-hi="फ्री पासपोर्ट मेकर">Free Passport Maker</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="/" data-en="Home" data-hi="होम">Home</a></li>
+                    <li><a href="/passport-maker" class="active" data-en="Passport Maker" data-hi="पासपोर्ट मेकर">Passport Maker</a></li>
+                    <li><a href="/about" data-en="About Us" data-hi="हमारे बारे में">About Us</a></li>
+                    <li><a href="/contact" data-en="Contact" data-hi="संपर्क करें">Contact</a></li>
+                </ul>
+                <div class="top-controls">
+                    <button class="control-btn theme-btn" id="themeBtn">🎨</button>
+                    <button class="control-btn lang-btn" id="langBtn">🌐 EN</button>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="theme-modal" id="themeModal">
+            <div class="theme-options">
+                <button class="theme-option" data-theme="default" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">Default</button>
+                <button class="theme-option" data-theme="ocean" style="background: linear-gradient(135deg, #0ea5e9, #06b6d4);">Ocean</button>
+                <button class="theme-option" data-theme="sunset" style="background: linear-gradient(135deg, #f97316, #ef4444);">Sunset</button>
+                <button class="theme-option" data-theme="forest" style="background: linear-gradient(135deg, #10b981, #059669);">Forest</button>
+                <button class="theme-option" data-theme="royal" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">Royal</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="passport-hero">
+            <div class="container">
+                <h1 data-en="Passport Photo Maker" data-hi="पासपोर्ट फोटो मेकर">Passport Photo Maker</h1>
+                <p data-en="Create professional passport photos - 12 photos per sheet at 300 DPI" data-hi="प्रोफेशनल पासपोर्ट फोटो बनाएं - 300 DPI पर प्रति शीट 12 फोटो">Create professional passport photos - 12 photos per sheet at 300 DPI</p>
+            </div>
+        </section>
+
+        <section class="passport-upload" id="passportUploadSection">
+            <div class="container">
+                
+                <!-- Quality Selector -->
+                <div class="quality-selector">
+                    <label data-en="Image Quality:" data-hi="इमेज क्वालिटी:">Image Quality:</label>
+                    <select id="passportQualitySelect">
+                        <option value="high" data-en="High Quality (300 DPI)" data-hi="उच्च गुणवत्ता (300 DPI)">High Quality (300 DPI)</option>
+                        <option value="medium" data-en="Medium Quality (85%)" data-hi="मध्यम गुणवत्ता (85%)">Medium Quality (85%)</option>
+                        <option value="low" data-en="Low Quality (70%)" data-hi="निम्न गुणवत्ता (70%)">Low Quality (70%)</option>
+                    </select>
+                </div>
+
+                <div class="upload-box" id="passportUploadBox">
+                    <input type="file" id="passportImageInput" accept="image/*" hidden>
+                    <div class="upload-content">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <h3 data-en="Upload Your Photo" data-hi="अपनी फोटो अपलोड करें">Upload Your Photo</h3>
+                        <p data-en="Upload a clear frontal photo of your face" data-hi="अपने चेहरे की एक स्पष्ट सामने की फोटो अपलोड करें">Upload a clear frontal photo of your face</p>
+                        <button class="btn-primary" onclick="document.getElementById('passportImageInput').click()" data-en="Upload Photo" data-hi="फोटो अपलोड करें">Upload Photo</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="passport-editor" id="passportEditor" style="display: none;">
+            <div class="container">
+                <h2 data-en="Edit Your Passport Photo" data-hi="अपनी पासपोर्ट फोटो एडिट करें">Edit Your Passport Photo</h2>
+                
+                <div class="editor-layout">
+                    <div class="preview-area">
+                        <h3 data-en="Preview" data-hi="पूर्वावलोकन">Preview</h3>
+                        <div class="canvas-container">
+                            <canvas id="passportCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="controls-area">
+                        <div class="control-group">
+                            <h4 data-en="Resize & Crop" data-hi="रीसाइज और क्रॉप">Resize & Crop</h4>
+                            <label data-en="Zoom:" data-hi="ज़ूम:">Zoom:</label>
+                            <input type="range" id="zoomSlider" min="0.5" max="3" step="0.1" value="1">
+                            
+                            <label data-en="Position X:" data-hi="पोजीशन X:">Position X:</label>
+                            <input type="range" id="posXSlider" min="-200" max="200" value="0">
+                            
+                            <label data-en="Position Y:" data-hi="पोजीशन Y:">Position Y:</label>
+                            <input type="range" id="posYSlider" min="-200" max="200" value="0">
+                        </div>
+
+                        <div class="control-group">
+                            <h4 data-en="Background Color" data-hi="बैकग्राउंड रंग">Background Color</h4>
+                            <div class="color-options">
+                                <button class="color-btn" data-color="#FFFFFF" style="background: #FFFFFF;" title="White">White</button>
+                                <button class="color-btn" data-color="#E8F4F8" style="background: #E8F4F8;" title="Blue">Blue</button>
+                                <button class="color-btn" data-color="#F0F0F0" style="background: #F0F0F0;" title="Gray">Gray</button>
+                                <button class="color-btn" data-color="#FF0000" style="background: #FF0000;" title="Red">Red</button>
+                                <input type="color" id="customColor" value="#FFFFFF">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <button class="btn-primary btn-full" id="removeBackgroundBtn" data-en="Remove Background" data-hi="बैकग्राउंड हटाएं">Remove Background</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="generate-section">
+                    <button class="btn-success btn-large" id="generatePassportBtn" data-en="Generate Passport Photo Sheet" data-hi="पासपोर्ट फोटो शीट जनरेट करें">Generate Passport Photo Sheet</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="passport-final" id="passportFinal" style="display: none;">
+            <div class="container">
+                <h2 data-en="Your Passport Photo Sheet is Ready!" data-hi="आपकी पासपोर्ट फोटो शीट तैयार है!">Your Passport Photo Sheet is Ready!</h2>
+                <p class="sheet-info" data-en="4&quot; x 6&quot; sheet with 12 passport photos (1.2&quot; x 1.4&quot; each at 300 DPI)" data-hi="4&quot; x 6&quot; शीट पर 12 पासपोर्ट फोटो (प्रत्येक 1.2&quot; x 1.4&quot; @ 300 DPI)">4" x 6" sheet with 12 passport photos (1.2" x 1.4" each at 300 DPI)</p>
+                
+                <div class="final-preview">
+                    <img id="finalPassportSheet" alt="Passport Photo Sheet">
+                </div>
+
+                <div class="download-buttons">
+                    <button class="btn-download" onclick="downloadPassport('png')" data-en="Download PNG" data-hi="PNG डाउनलोड करें">Download PNG</button>
+                    <button class="btn-download" onclick="downloadPassport('jpeg')" data-en="Download JPEG" data-hi="JPEG डाउनलोड करें">Download JPEG</button>
+                    <button class="btn-secondary" onclick="resetPassportMaker()" data-en="Create Another Photo" data-hi="दूसरी फोटो बनाएं">Create Another Photo</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="loading" id="passportLoading" style="display: none;">
+            <div class="spinner"></div>
+            <p data-en="Processing your photo..." data-hi="आपकी फोटो प्रोसेस हो रही है...">Processing your photo...</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Free Passport Maker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/passport.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/language.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>
