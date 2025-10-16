@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, send_file, jsonify
 from flask_cors import CORS
-from rembg import remove
+# from rembg import remove  # ✅ Commented out - not available in free tier
 from PIL import Image, ImageDraw, ImageFont
 import io
 import base64
@@ -9,17 +9,21 @@ import atexit
 import shutil
 from werkzeug.utils import secure_filename
 
+
 app = Flask(__name__)
 CORS(app)  # Enable CORS for API calls
+
 
 # Configuration
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'webp'}
 
+
 # Environment variables
 PORT = int(os.environ.get('PORT', 5000))
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
 
 # Create uploads folder
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -64,6 +68,11 @@ def about():
 
 @app.route('/api/remove-background', methods=['POST'])
 def remove_background():
+    """
+    Background removal endpoint
+    Note: AI-based background removal requires heavy libraries (rembg)
+    which need more than 512MB RAM. This is a placeholder for demonstration.
+    """
     try:
         if 'image' not in request.files:
             return jsonify({'error': 'No image provided'}), 400
@@ -76,10 +85,15 @@ def remove_background():
         
         if file and allowed_file(file.filename):
             input_image = file.read()
-            output_image = remove(input_image)
+            
+            # Open image
+            img = Image.open(io.BytesIO(input_image))
+            
+            # Convert to RGBA for transparency support
+            if img.mode != 'RGBA':
+                img = img.convert('RGBA')
             
             # Apply quality settings
-            img = Image.open(io.BytesIO(output_image))
             buffered = io.BytesIO()
             
             if quality == 'high':
@@ -95,13 +109,14 @@ def remove_background():
             
             return jsonify({
                 'success': True,
-                'image': f'data:image/png;base64,{output_base64}'
+                'image': f'data:image/png;base64,{output_base64}',
+                'message': 'Note: AI background removal requires upgraded hosting plan. Currently returning processed image.'
             })
         
         return jsonify({'error': 'Invalid file type'}), 400
     
     except Exception as e:
-        print(f"Error in remove_background: {str(e)}")  # Server logs
+        print(f"Error in remove_background: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
