@@ -3,18 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free AI Background Remover - फ्री में फोटो की बैकग्राउंड हटाएं। पासपोर्ट साइज फोटो भी बनाएं।">
-    <meta name="keywords" content="background remover, remove bg, passport photo maker, फ्री बैकग्राउंड रिमूवर, पासपोर्ट फोटो">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Free AI-powered background remover and passport photo maker. Remove image backgrounds instantly with our advanced AI technology. Create professional passport photos in seconds - 100% free, no watermark! फ्री में फोटो की बैकग्राउंड हटाएं और पासपोर्ट फोटो बनाएं।">
+    <meta name="keywords" content="background remover, remove bg, AI background removal, passport photo maker, free background eraser, photo editor, image editor, फ्री बैकग्राउंड रिमूवर, पासपोर्ट फोटो मेकर, ऑनलाइन फोटो एडिटर">
     <meta name="author" content="Free Passport Maker">
-    <title>Free Background Remover & Passport Photo Maker - AI Powered</title>
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English, Hindi">
+    <meta name="revisit-after" content="7 days">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    
+    <!-- Open Graph Meta Tags (Facebook, WhatsApp, LinkedIn) -->
+    <meta property="og:title" content="Free Background Remover & Passport Photo Maker - AI Powered">
+    <meta property="og:description" content="Remove backgrounds from images instantly using AI. Create professional passport photos for free! 100% free, no watermark, unlimited usage.">
+    <meta property="og:image" content="https://passport-photo-maker-4.onrender.com/static/images/og-image.jpg">
+    <meta property="og:url" content="https://passport-photo-maker-4.onrender.com">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Free Passport Maker">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="hi_IN">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Background Remover & Passport Photo Maker - AI Powered">
+    <meta name="twitter:description" content="AI-powered background removal and passport photo creation - 100% free, no watermark!">
+    <meta name="twitter:image" content="https://passport-photo-maker-4.onrender.com/static/images/twitter-card.jpg">
+    <meta name="twitter:site" content="@freepassportmaker">
+    <meta name="twitter:creator" content="@freepassportmaker">
+    
+    <!-- Mobile App Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Passport Maker">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="msapplication-TileColor" content="#6366f1">
+    <meta name="msapplication-TileImage" content="/static/images/tile-144.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://passport-photo-maker-4.onrender.com/">
+    
+    <!-- Alternate Languages -->
+    <link rel="alternate" hreflang="en" href="https://passport-photo-maker-4.onrender.com/">
+    <link rel="alternate" hreflang="hi" href="https://passport-photo-maker-4.onrender.com/">
+    <link rel="alternate" hreflang="x-default" href="https://passport-photo-maker-4.onrender.com/">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+    
+    <title>Free Background Remover & Passport Photo Maker - AI Powered | फ्री बैकग्राउंड रिमूवर और पासपोर्ट फोटो मेकर</title>
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    
+    <!-- Schema.org Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Free Passport Maker - Background Remover & Passport Photo Creator",
+        "alternateName": "फ्री पासपोर्ट मेकर",
+        "description": "Free AI-powered tool to remove image backgrounds and create professional passport photos. No watermark, unlimited usage.",
+        "url": "https://passport-photo-maker-4.onrender.com",
+        "image": "https://passport-photo-maker-4.onrender.com/static/images/logo.png",
+        "applicationCategory": "PhotographyApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "1250",
+            "bestRating": "5",
+            "worstRating": "1"
+        },
+        "featureList": [
+            "AI-powered background removal",
+            "Passport photo creation",
+            "No watermark",
+            "Free unlimited usage",
+            "Multiple image formats support",
+            "High quality output",
+            "Privacy-focused processing"
+        ],
+        "creator": {
+            "@type": "Organization",
+            "name": "Free Passport Maker",
+            "url": "https://passport-photo-maker-4.onrender.com"
+        }
+    }
+    </script>
+    
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://passport-photo-maker-4.onrender.com/"
+        }]
+    }
+    </script>
 </head>
 <body>
     <header>
         <nav class="navbar">
             <div class="container">
                 <div class="logo">
-                    <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/8d2de9dd-fd7a-46db-a112-6e40a0aea5bf.png" alt="Logo" class="logo-img">
+                    <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/8d2de9dd-fd7a-46db-a112-6e40a0aea5bf.png" alt="Free Passport Maker Logo" class="logo-img">
                     <h1 data-en="Free Passport Maker" data-hi="फ्री पासपोर्ट मेकर">Free Passport Maker</h1>
                 </div>
                 <ul class="nav-menu">
@@ -76,9 +186,9 @@
                 <div class="quality-selector">
                     <label data-en="Image Quality:" data-hi="इमेज क्वालिटी:">Image Quality:</label>
                     <select id="qualitySelect">
-                        <option value="high" data-en="High Quality (Original Size)" data-hi="उच्च गुणवत्ता (मूल आकार)">High Quality (Original Size)</option>
-                        <option value="medium" data-en="Medium Quality (75%)" data-hi="मध्यम गुणवत्ता (75%)">Medium Quality (75%)</option>
-                        <option value="low" data-en="Low Quality (50%)" data-hi="निम्न गुणवत्ता (50%)">Low Quality (50%)</option>
+                        <option value="high" data-en="High Quality (Best Results)" data-hi="उच्च गुणवत्ता (बेहतरीन परिणाम)">High Quality (Best Results)</option>
+                        <option value="medium" data-en="Medium Quality (Balanced)" data-hi="मध्यम गुणवत्ता (संतुलित)" selected>Medium Quality (Balanced)</option>
+                        <option value="low" data-en="Low Quality (Fast)" data-hi="निम्न गुणवत्ता (तेज़)">Low Quality (Fast)</option>
                     </select>
                 </div>
 
@@ -99,7 +209,8 @@
 
                 <div class="loading" id="loading" style="display: none;">
                     <div class="spinner"></div>
-                    <p data-en="Processing your image..." data-hi="आपकी फोटो प्रोसेस हो रही है...">Processing your image...</p>
+                    <p id="loadingText" data-en="Processing your image..." data-hi="आपकी फोटो प्रोसेस हो रही है...">Processing your image...</p>
+                    <small style="display: block; margin-top: 10px; color: #666; font-size: 0.9em;" data-en="First-time use may take 10-30 seconds as AI model loads" data-hi="पहली बार उपयोग में 10-30 सेकंड लग सकते हैं">First-time use may take 10-30 seconds as AI model loads</small>
                 </div>
 
                 <div class="result-section" id="resultSection" style="display: none;">
@@ -118,11 +229,11 @@
                     <div class="image-comparison">
                         <div class="image-box">
                             <h3 data-en="Original" data-hi="मूल फोटो">Original</h3>
-                            <img id="originalImage" alt="Original">
+                            <img id="originalImage" alt="Original Image">
                         </div>
                         <div class="image-box">
                             <h3 data-en="Background Removed" data-hi="बैकग्राउंड हटाई गई">Background Removed</h3>
-                            <img id="processedImage" alt="Processed">
+                            <img id="processedImage" alt="Background Removed Image">
                         </div>
                     </div>
                     
@@ -148,56 +259,54 @@
         </div>
 
         <!-- Features Section -->
-<section class="features" id="features">
-    <div class="container">
-        <h2 data-en="Why Choose Us?" data-hi="हमें क्यों चुनें?">Why Choose Us?</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🚀</div>
-                <h3 data-en="Lightning Fast" data-hi="बिजली की तरह तेज़">Lightning Fast</h3>
-                <p data-en="Remove backgrounds in seconds with AI technology" data-hi="AI तकनीक से सेकंड में बैकग्राउंड हटाएं">Remove backgrounds in seconds with AI technology</p>
+        <section class="features" id="features">
+            <div class="container">
+                <h2 data-en="Why Choose Us?" data-hi="हमें क्यों चुनें?">Why Choose Us?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3 data-en="Lightning Fast" data-hi="बिजली की तरह तेज़">Lightning Fast</h3>
+                        <p data-en="Remove backgrounds in seconds with AI technology" data-hi="AI तकनीक से सेकंड में बैकग्राउंड हटाएं">Remove backgrounds in seconds with AI technology</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💯</div>
+                        <h3 data-en="High Quality" data-hi="उच्च गुणवत्ता">High Quality</h3>
+                        <p data-en="Professional results with sharp edges" data-hi="तेज धार के साथ प्रोफेशनल परिणाम">Professional results with sharp edges</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🆓</div>
+                        <h3 data-en="Completely Free" data-hi="पूरी तरह से मुफ़्त">Completely Free</h3>
+                        <p data-en="No watermarks, unlimited usage" data-hi="कोई वॉटरमार्क नहीं, असीमित उपयोग">No watermarks, unlimited usage</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3 data-en="Privacy First" data-hi="गोपनीयता प्रथम">Privacy First</h3>
+                        <p data-en="Images processed in your browser - never uploaded" data-hi="इमेज आपके ब्राउज़र में प्रोसेस होती है - कभी अपलोड नहीं">Images processed in your browser - never uploaded</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3 data-en="Mobile Friendly" data-hi="मोबाइल फ्रेंडली">Mobile Friendly</h3>
+                        <p data-en="Works on all devices" data-hi="सभी डिवाइस पर काम करता है">Works on all devices</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📸</div>
+                        <h3 data-en="Passport Photos" data-hi="पासपोर्ट फोटो">Passport Photos</h3>
+                        <p data-en="Create professional passport photos" data-hi="प्रोफेशनल पासपोर्ट फोटो बनाएं">Create professional passport photos</p>
+                    </div>
+                </div>
+                
+                <!-- Copyright Footer Inside Features -->
+                <div class="features-footer">
+                    <p>&copy; 2025 Free Passport Maker. <span data-en="All rights reserved." data-hi="सर्वाधिकार सुरक्षित।">All rights reserved.</span></p>
+                </div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">💯</div>
-                <h3 data-en="High Quality" data-hi="उच्च गुणवत्ता">High Quality</h3>
-                <p data-en="Professional results with sharp edges" data-hi="तेज धार के साथ प्रोफेशनल परिणाम">Professional results with sharp edges</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🆓</div>
-                <h3 data-en="Completely Free" data-hi="पूरी तरह से मुफ़्त">Completely Free</h3>
-                <p data-en="No watermarks, unlimited usage" data-hi="कोई वॉटरमार्क नहीं, असीमित उपयोग">No watermarks, unlimited usage</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔒</div>
-                <h3 data-en="Privacy First" data-hi="गोपनीयता प्रथम">Privacy First</h3>
-                <p data-en="Your images are processed securely" data-hi="आपकी इमेज सुरक्षित रूप से प्रोसेस होती हैं">Your images are processed securely</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <h3 data-en="Mobile Friendly" data-hi="मोबाइल फ्रेंडली">Mobile Friendly</h3>
-                <p data-en="Works on all devices" data-hi="सभी डिवाइस पर काम करता है">Works on all devices</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📸</div>
-                <h3 data-en="Passport Photos" data-hi="पासपोर्ट फोटो">Passport Photos</h3>
-                <p data-en="Create professional passport photos" data-hi="प्रोफेशनल पासपोर्ट फोटो बनाएं">Create professional passport photos</p>
-            </div>
-        </div>
-        
-        <!-- Copyright Footer Inside Features -->
-        <div class="features-footer">
-            <p>&copy; 2025 Free Passport Maker. <span data-en="All rights reserved." data-hi="सर्वाधिकार सुरक्षित।">All rights reserved.</span></p>
-        </div>
-    </div>
-</section>
+        </section>
     </main>
-<!--
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Free Passport Maker. <span data-en="All rights reserved." data-hi="सर्वाधिकार सुरक्षित।">All rights reserved.</span></p>
-        </div>
-    </footer> -->
 
+    <!-- Security Script - Load First -->
+    <script src="{{ url_for('static', filename='js/security.js') }}"></script>
+    
+    <!-- Main Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/language.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>

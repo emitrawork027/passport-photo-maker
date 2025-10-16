@@ -14,6 +14,46 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for API calls
 
 
+# Security Headers
+@app.after_request
+def set_security_headers(response):
+    """Set security headers for all responses"""
+    
+    # Prevent clickjacking attacks
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    
+    # Enable XSS filter
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    
+    # Prevent MIME type sniffing
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    
+    # Referrer Policy
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    
+    # Content Security Policy (Fixed - removed markdown links)
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self' https://cdn.jsdelivr.net; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: https: blob:; "
+        "font-src 'self' data:; "
+        "connect-src 'self' https://cdn.jsdelivr.net;"
+    )
+    
+    # Permissions Policy (formerly Feature Policy)
+    response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+    
+    # Remove or modify server header
+    response.headers['Server'] = 'SecureServer'
+    
+    # Strict Transport Security (HTTPS only)
+    if request.is_secure:
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    
+    return response
+
+
 # Configuration
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -234,6 +274,51 @@ def contact_form():
 @app.route('/health')
 def health():
     return jsonify({'status': 'healthy'}), 200
+
+
+# Robots.txt for SEO
+@app.route('/robots.txt')
+def robots():
+    return '''User-agent: *
+Allow: /
+Sitemap: https://passport-photo-maker-4.onrender.com/sitemap.xml
+''', 200, {'Content-Type': 'text/plain'}
+
+
+# Sitemap for SEO
+@app.route('/sitemap.xml')
+def sitemap():
+    pages = [
+        {'loc': '/', 'priority': '1.0', 'changefreq': 'daily'},
+        {'loc': '/passport-maker', 'priority': '0.8', 'changefreq': 'weekly'},
+        {'loc': '/about', 'priority': '0.5', 'changefreq': 'monthly'},
+        {'loc': '/contact', 'priority': '0.5', 'changefreq': 'monthly'},
+    ]
+    
+    sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    sitemap_xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    
+    for page in pages:
+        sitemap_xml += f'  <url>\n'
+        sitemap_xml += f'    <loc>https://passport-photo-maker-4.onrender.com{page["loc"]}</loc>\n'
+        sitemap_xml += f'    <priority>{page["priority"]}</priority>\n'
+        sitemap_xml += f'    <changefreq>{page["changefreq"]}</changefreq>\n'
+        sitemap_xml += f'  </url>\n'
+    
+    sitemap_xml += '</urlset>'
+    
+    return sitemap_xml, 200, {'Content-Type': 'application/xml'}
+
+
+# Error handlers
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({'error': 'Internal server error'}), 500
 
 
 if __name__ == '__main__':
