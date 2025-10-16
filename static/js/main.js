@@ -8,23 +8,6 @@ const qualitySelect = document.getElementById('qualitySelect');
 
 let processedImageData = null;
 
-// Load background removal library dynamically
-let removeBackgroundLib = null;
-
-async function loadBackgroundRemovalLibrary() {
-    if (removeBackgroundLib) return removeBackgroundLib;
-    
-    try {
-        const module = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/browser.js');
-        removeBackgroundLib = module.default;
-        console.log('Background removal library loaded successfully');
-        return removeBackgroundLib;
-    } catch (error) {
-        console.error('Failed to load background removal library:', error);
-        throw new Error('Failed to load required library. Please refresh the page.');
-    }
-}
-
 // Drag and drop
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     uploadBox.addEventListener(eventName, preventDefaults, false);
@@ -83,59 +66,40 @@ async function handleFiles(files) {
     // Update loading message
     const loadingText = loading.querySelector('p');
     if (loadingText) {
-        loadingText.textContent = 'Loading AI model... This may take a moment on first use.';
+        loadingText.textContent = 'Processing your image...';
     }
 
+    // Use server-side processing (simple and reliable)
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('quality', qualitySelect.value);
+
     try {
-        // Load the background removal library
-        const removeBackground = await loadBackgroundRemovalLibrary();
-        
-        // Update loading message
-        if (loadingText) {
-            loadingText.textContent = 'Processing image... Please wait 10-30 seconds.';
-        }
+        const response = await fetch('/api/remove-background', {
+            method: 'POST',
+            body: formData
+        });
 
-        // Create blob from file
-        const imageUrl = URL.createObjectURL(file);
-        
-        // Configure based on quality setting
-        const quality = qualitySelect.value;
-        let config = {
-            output: {
-                format: 'png',
-                quality: 0.8
-            }
-        };
+        const result = await response.json();
 
-        // Adjust model based on quality
-        if (quality === 'high') {
-            config.model = 'medium'; // Better quality but slower
-        } else if (quality === 'medium') {
-            config.model = 'small'; // Balanced
-        } else {
-            config.model = 'small'; // Fast
-            config.output.quality = 0.6;
-        }
-
-        // Remove background using client-side AI
-        const blob = await removeBackground(imageUrl, config);
-        
-        // Convert blob to base64
-        const reader2 = new FileReader();
-        reader2.onloadend = function() {
-            processedImageData = reader2.result;
-            processedImage.src = processedImageData;
+        if (result.success) {
+            processedImageData = result.image;
+            processedImage.src = result.image;
             loading.style.display = 'none';
             resultSection.style.display = 'block';
-        };
-        reader2.readAsDataURL(blob);
-        
-        // Clean up
-        URL.revokeObjectURL(imageUrl);
-
+            
+            // Show message if background removal not available
+            if (result.message) {
+                setTimeout(() => {
+                    alert(result.message);
+                }, 500);
+            }
+        } else {
+            throw new Error(result.error || 'Processing failed');
+        }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error processing image: ' + error.message + '\n\nPlease try again or use a smaller image.');
+        alert('Error processing image. Please try again or use a smaller image.');
         loading.style.display = 'none';
         uploadBox.style.display = 'block';
     }
@@ -145,7 +109,7 @@ function downloadImage(format) {
     if (!processedImageData) return;
 
     const link = document.createElement('a');
-    link.download = `background-removed.${format}`;
+    link.download = `processed-image.${format}`;
     
     if (format === 'jpg') {
         const img = new Image();
