@@ -1,15 +1,13 @@
 from flask import Flask, render_template, request, send_file, jsonify
 from flask_cors import CORS
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageChops
 import io
 import base64
 import os
 import atexit
 import shutil
 from werkzeug.utils import secure_filename
-import numpy as np
-from scipy import ndimage
-from skimage import color, filters
+
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for API calls
@@ -83,9 +81,8 @@ def about():
 @app.route('/api/remove-background', methods=['POST'])
 def remove_background():
     """
-    Background removal using edge detection and color segmentation
-    Works on Python 3.13 without MediaPipe/OpenCV
-    Free tier compatible (512MB RAM)
+    Simple background removal using PIL only
+    Works on any hosting - no special dependencies
     """
     try:
         if 'image' not in request.files:
@@ -101,87 +98,48 @@ def remove_background():
             print(f"Processing image: {file.filename}")
             
             # Open image
-            img = Image.open(file.stream).convert('RGB')
-            img_array = np.array(img) / 255.0  # Normalize to 0-1
+            img = Image.open(file.stream).convert('RGBA')
             
-            # Convert to LAB color space for better segmentation
-            img_lab = color.rgb2lab(img_array)
+            # Simple method: detect edges and create mask
+            # Convert to grayscale for processing
+            gray = img.convert('L')
             
-            # Use edge detection
-            gray = color.rgb2gray(img_array)
-            edges = filters.sobel(gray)
+            # Find edges
+            edges = gray.filter(ImageFilter.FIND_EDGES)
+            edges = edges.filter(ImageFilter.SMOOTH_MORE)
             
-            # Threshold edges
-            edge_mask = edges > 0.05
+            # Enhance contrast
+            edges = ImageChops.invert(edges)
             
-            # Sample background from corners
-            h, w = img_array.shape[:2]
-            corner_size = min(20, h // 10, w // 10)  # Adaptive corner size
+            # Threshold to create mask
+            threshold = 128
+            mask = edges.point(lambda x: 255 if x > threshold else 0, mode='L')
             
-            # Get corner samples
-            corners = [
-                img_lab[:corner_size, :corner_size],  # Top-left
-                img_lab[:corner_size, -corner_size:],  # Top-right
-                img_lab[-corner_size:, :corner_size],  # Bottom-left
-                img_lab[-corner_size:, -corner_size:]  # Bottom-right
-            ]
+            # Clean up mask
+            mask = mask.filter(ImageFilter.MinFilter(3))
+            mask = mask.filter(ImageFilter.MaxFilter(3))
+            mask = mask.filter(ImageFilter.GaussianBlur(2))
             
-            # Calculate background color (median of corners)
-            bg_lab = np.mean([np.mean(corner.reshape(-1, 3), axis=0) for corner in corners], axis=0)
-            
-            # Calculate distance from background color
-            diff = np.sqrt(np.sum((img_lab - bg_lab) ** 2, axis=2))
-            
-            # Normalize difference
-            diff_norm = (diff - diff.min()) / (diff.max() - diff.min() + 1e-8)
-            
-            # Create mask with adaptive threshold
-            threshold = 0.2  # Adjust for more/less aggressive removal
-            mask = diff_norm > threshold
-            
-            # Combine with edge detection to preserve subject
-            mask = np.logical_and(mask, ~edge_mask)
-            
-            # Clean up mask with morphological operations
-            mask = ndimage.binary_fill_holes(mask)
-            mask = ndimage.binary_opening(mask, iterations=2)
-            mask = ndimage.binary_closing(mask, iterations=3)
-            
-            # Find largest connected component (assumed to be subject)
-            labeled, num_features = ndimage.label(mask)
-            if num_features > 0:
-                sizes = ndimage.sum(mask, labeled, range(num_features + 1))
-                mask = (labeled == np.argmax(sizes))
-            
-            # Smooth edges with Gaussian blur
-            mask_float = mask.astype(float)
-            mask_float = ndimage.gaussian_filter(mask_float, sigma=3)
-            
-            # Convert mask to 0-255
-            alpha_channel = (mask_float * 255).astype(np.uint8)
-            
-            # Create RGBA image
-            img_rgb = (img_array * 255).astype(np.uint8)
-            img_rgba = np.dstack([img_rgb, alpha_channel])
-            result = Image.fromarray(img_rgba, 'RGBA')
+            # Apply mask to original image
+            img.putalpha(mask)
             
             # Apply quality settings
             buffered = io.BytesIO()
             
             if quality == 'high':
-                result.save(buffered, format="PNG", optimize=False)
+                img.save(buffered, format="PNG", optimize=False)
             elif quality == 'medium':
-                result = result.resize(
-                    (int(result.width * 0.75), int(result.height * 0.75)), 
+                img = img.resize(
+                    (int(img.width * 0.75), int(img.height * 0.75)), 
                     Image.LANCZOS
                 )
-                result.save(buffered, format="PNG", optimize=True)
+                img.save(buffered, format="PNG", optimize=True)
             else:  # low
-                result = result.resize(
-                    (int(result.width * 0.5), int(result.height * 0.5)), 
+                img = img.resize(
+                    (int(img.width * 0.5), int(img.height * 0.5)), 
                     Image.LANCZOS
                 )
-                result.save(buffered, format="PNG", optimize=True)
+                img.save(buffered, format="PNG", optimize=True)
             
             output_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
             
