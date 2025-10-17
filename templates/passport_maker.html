@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Create perfect passport photos online. 12 photos per sheet at 300 DPI.">
+    <meta name="description" content="Create perfect passport photos online with custom sizes and colors.">
     <title>Passport Photo Maker - Free Passport Maker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/confetti.css') }}">
 </head>
 <body>
     <header>
@@ -13,13 +14,13 @@
             <div class="container">
                 <div class="logo">
                     <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/8d2de9dd-fd7a-46db-a112-6e40a0aea5bf.png" alt="Logo" class="logo-img">
-                    <h1 data-en="Free Passport Maker" data-hi="फ्री पासपोर्ट मेकर">Free Passport Maker</h1>
+                    <h1>Free Passport Maker</h1>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="/" data-en="Home" data-hi="होम">Home</a></li>
-                    <li><a href="/passport-maker" class="active" data-en="Passport Maker" data-hi="पासपोर्ट मेकर">Passport Maker</a></li>
-                    <li><a href="/about" data-en="About Us" data-hi="हमारे बारे में">About Us</a></li>
-                    <li><a href="/contact" data-en="Contact" data-hi="संपर्क करें">Contact</a></li>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/passport-maker" class="active">Passport Maker</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
                 </ul>
                 <div class="top-controls">
                     <button class="control-btn theme-btn" id="themeBtn">🎨</button>
@@ -42,21 +43,19 @@
     <main>
         <section class="passport-hero">
             <div class="container">
-                <h1 data-en="Passport Photo Maker" data-hi="पासपोर्ट फोटो मेकर">Passport Photo Maker</h1>
-                <p data-en="Create professional passport photos - 12 photos per sheet at 300 DPI" data-hi="प्रोफेशनल पासपोर्ट फोटो बनाएं - 300 DPI पर प्रति शीट 12 फोटो">Create professional passport photos - 12 photos per sheet at 300 DPI</p>
+                <h1>Passport Photo Maker</h1>
+                <p>Create professional passport photos with custom sizes</p>
             </div>
         </section>
 
         <section class="passport-upload" id="passportUploadSection">
             <div class="container">
-                
-                <!-- Quality Selector -->
                 <div class="quality-selector">
-                    <label data-en="Image Quality:" data-hi="इमेज क्वालिटी:">Image Quality:</label>
+                    <label>Image Quality:</label>
                     <select id="passportQualitySelect">
-                        <option value="high" data-en="High Quality (300 DPI)" data-hi="उच्च गुणवत्ता (300 DPI)">High Quality (300 DPI)</option>
-                        <option value="medium" data-en="Medium Quality (85%)" data-hi="मध्यम गुणवत्ता (85%)">Medium Quality (85%)</option>
-                        <option value="low" data-en="Low Quality (70%)" data-hi="निम्न गुणवत्ता (70%)">Low Quality (70%)</option>
+                        <option value="high">High Quality (300 DPI)</option>
+                        <option value="medium">Medium Quality (85%)</option>
+                        <option value="low">Low Quality (70%)</option>
                     </select>
                 </div>
 
@@ -68,9 +67,9 @@
                             <polyline points="17 8 12 3 7 8"></polyline>
                             <line x1="12" y1="3" x2="12" y2="15"></line>
                         </svg>
-                        <h3 data-en="Upload Your Photo" data-hi="अपनी फोटो अपलोड करें">Upload Your Photo</h3>
-                        <p data-en="Upload a clear frontal photo of your face" data-hi="अपने चेहरे की एक स्पष्ट सामने की फोटो अपलोड करें">Upload a clear frontal photo of your face</p>
-                        <button class="btn-primary" onclick="document.getElementById('passportImageInput').click()" data-en="Upload Photo" data-hi="फोटो अपलोड करें">Upload Photo</button>
+                        <h3>Upload Your Photo</h3>
+                        <p>Upload a clear frontal photo</p>
+                        <button class="btn-primary" onclick="document.getElementById('passportImageInput').click()">Upload Photo</button>
                     </div>
                 </div>
             </div>
@@ -78,11 +77,11 @@
 
         <section class="passport-editor" id="passportEditor" style="display: none;">
             <div class="container">
-                <h2 data-en="Edit Your Passport Photo" data-hi="अपनी पासपोर्ट फोटो एडिट करें">Edit Your Passport Photo</h2>
+                <h2>Edit Your Passport Photo</h2>
                 
                 <div class="editor-layout">
                     <div class="preview-area">
-                        <h3 data-en="Preview" data-hi="पूर्वावलोकन">Preview</h3>
+                        <h3>Preview</h3>
                         <div class="canvas-container">
                             <canvas id="passportCanvas"></canvas>
                         </div>
@@ -90,60 +89,122 @@
 
                     <div class="controls-area">
                         <div class="control-group">
-                            <h4 data-en="Resize & Crop" data-hi="रीसाइज और क्रॉप">Resize & Crop</h4>
-                            <label data-en="Zoom:" data-hi="ज़ूम:">Zoom:</label>
-                            <input type="range" id="zoomSlider" min="0.5" max="3" step="0.1" value="1">
+                            <h4>Photo Size</h4>
+                            <select id="photoSizeSelect" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; margin-bottom: 15px;">
+                                <option value="1.2,1.4">India Passport (1.2" x 1.4")</option>
+                                <option value="2,2">USA Passport (2" x 2")</option>
+                                <option value="1.38,1.77">UK Passport (1.38" x 1.77")</option>
+                                <option value="1.2,1.6">Visa Size (1.2" x 1.6")</option>
+                                <option value="custom">Custom Size...</option>
+                            </select>
                             
-                            <label data-en="Position X:" data-hi="पोजीशन X:">Position X:</label>
-                            <input type="range" id="posXSlider" min="-200" max="200" value="0">
-                            
-                            <label data-en="Position Y:" data-hi="पोजीशन Y:">Position Y:</label>
-                            <input type="range" id="posYSlider" min="-200" max="200" value="0">
-                        </div>
-
-                        <div class="control-group">
-                            <h4 data-en="Background Color" data-hi="बैकग्राउंड रंग">Background Color</h4>
-                            <div class="color-options">
-                                <button class="color-btn" data-color="#FFFFFF" style="background: #FFFFFF;" title="White">White</button>
-                                <button class="color-btn" data-color="#E8F4F8" style="background: #E8F4F8;" title="Blue">Blue</button>
-                                <button class="color-btn" data-color="#F0F0F0" style="background: #F0F0F0;" title="Gray">Gray</button>
-                                <button class="color-btn" data-color="#FF0000" style="background: #FF0000;" title="Red">Red</button>
-                                <input type="color" id="customColor" value="#FFFFFF">
+                            <div id="customSizeInputs" style="display: none; padding: 15px; background: #f9fafb; border-radius: 8px; margin-bottom: 15px;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Width (inches):</label>
+                                        <input type="number" id="customWidth" step="0.1" min="0.5" max="4" value="1.2" style="width: 100%; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px;">
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Height (inches):</label>
+                                        <input type="number" id="customHeight" step="0.1" min="0.5" max="6" value="1.4" style="width: 100%; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px;">
+                                    </div>
+                                </div>
+                                <p style="margin: 10px 0 0 0; font-size: 14px; color: #6b7280;">💡 1 inch = 25.4mm | Max: 4" x 6"</p>
                             </div>
                         </div>
 
                         <div class="control-group">
-                            <button class="btn-primary btn-full" id="removeBackgroundBtn" data-en="Remove Background" data-hi="बैकग्राउंड हटाएं">Remove Background</button>
+                            <h4>Resize & Crop</h4>
+                            <label>Zoom:</label>
+                            <input type="range" id="zoomSlider" min="0.5" max="3" step="0.1" value="1">
+                            
+                            <label>Position X:</label>
+                            <input type="range" id="posXSlider" min="-200" max="200" value="0">
+                            
+                            <label>Position Y:</label>
+                            <input type="range" id="posYSlider" min="-200" max="200" value="0">
+                        </div>
+
+                        <div class="control-group">
+                            <h4>Background Color</h4>
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px;">
+                                <button class="color-btn" data-color="#FFFFFF" style="background: #FFFFFF; border: 2px solid #e5e7eb; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">White</button>
+                                <button class="color-btn" data-color="#0ea5e9" style="background: #0ea5e9; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">Blue</button>
+                                <button class="color-btn" data-color="#6b7280" style="background: #6b7280; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">Gray</button>
+                                <button class="color-btn" data-color="#ef4444" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">Red</button>
+                                <button class="color-btn" data-color="#f5f5dc" style="background: #f5f5dc; border: 2px solid #e5e7eb; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">Beige</button>
+                                <button class="color-btn" data-color="#e0f2fe" style="background: #e0f2fe; border: 2px solid #bae6fd; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">Lt Blue</button>
+                                <button class="color-btn" data-color="#10b981" style="background: #10b981; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">Green</button>
+                                <button class="color-btn" data-color="#8b5cf6" style="background: #8b5cf6; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">Purple</button>
+                            </div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Custom Color:</label>
+                            <input type="color" id="customColor" value="#0ea5e9" style="width: 100%; height: 50px; border-radius: 8px; border: 2px solid #e5e7eb; cursor: pointer;">
+                        </div>
+
+                        <div class="control-group">
+                            <button class="btn-primary btn-full" id="removeBackgroundBtn">Remove Background</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="generate-section">
-                    <button class="btn-success btn-large" id="generatePassportBtn" data-en="Generate Passport Photo Sheet" data-hi="पासपोर्ट फोटो शीट जनरेट करें">Generate Passport Photo Sheet</button>
+                    <button class="btn-success btn-large" id="generatePassportBtn">Generate Passport Photo Sheet</button>
                 </div>
             </div>
         </section>
 
         <section class="passport-final" id="passportFinal" style="display: none;">
             <div class="container">
-                <h2 data-en="Your Passport Photo Sheet is Ready!" data-hi="आपकी पासपोर्ट फोटो शीट तैयार है!">Your Passport Photo Sheet is Ready!</h2>
-                <p class="sheet-info" data-en="4&quot; x 6&quot; sheet with 12 passport photos (1.2&quot; x 1.4&quot; each at 300 DPI)" data-hi="4&quot; x 6&quot; शीट पर 12 पासपोर्ट फोटो (प्रत्येक 1.2&quot; x 1.4&quot; @ 300 DPI)">4" x 6" sheet with 12 passport photos (1.2" x 1.4" each at 300 DPI)</p>
+                <h2>Your Passport Photo Sheet is Ready!</h2>
+                <p class="sheet-info">4" x 6" sheet with 12 passport photos at 300 DPI</p>
                 
                 <div class="final-preview">
                     <img id="finalPassportSheet" alt="Passport Photo Sheet">
                 </div>
 
+                <div class="print-instructions" style="margin: 30px 0;">
+                    <h3 style="margin: 0 0 20px 0; color: #0c4a6e; font-size: 24px; display: flex; align-items: center; gap: 10px;">
+                        <span>🖨️</span> Printing Instructions
+                    </h3>
+                    <div style="display: grid; gap: 15px;">
+                        <div class="instruction-step">
+                            <span class="step-number">1</span>
+                            <p class="step-text">Download the image using button below</p>
+                        </div>
+                        <div class="instruction-step">
+                            <span class="step-number">2</span>
+                            <p class="step-text">Print on <strong>4" x 6" glossy photo paper</strong></p>
+                        </div>
+                        <div class="instruction-step">
+                            <span class="step-number">3</span>
+                            <p class="step-text">Use <strong>"Actual Size"</strong> or <strong>"100%"</strong> print setting</p>
+                        </div>
+                        <div class="instruction-step warning-step">
+                            <span class="step-number">⚠️</span>
+                            <p class="step-text"><strong>Do NOT</strong> use "Fit to Page"</p>
+                        </div>
+                        <div class="instruction-step success-step">
+                            <span class="step-number">✓</span>
+                            <p class="step-text">You'll get <strong>12 perfect passport photos!</strong></p>
+                        </div>
+                    </div>
+                    <div class="pro-tip">
+                        <p>💡 <strong>Pro Tip:</strong> Local photo shops print for ₹10-30/sheet</p>
+                    </div>
+                </div>
+
                 <div class="download-buttons">
-                    <button class="btn-download" onclick="downloadPassport('png')" data-en="Download PNG" data-hi="PNG डाउनलोड करें">Download PNG</button>
-                    <button class="btn-download" onclick="downloadPassport('jpeg')" data-en="Download JPEG" data-hi="JPEG डाउनलोड करें">Download JPEG</button>
-                    <button class="btn-secondary" onclick="resetPassportMaker()" data-en="Create Another Photo" data-hi="दूसरी फोटो बनाएं">Create Another Photo</button>
+                    <button class="btn-download" onclick="downloadPassport('png')">Download PNG</button>
+                    <button class="btn-download" onclick="downloadPassport('jpeg')">Download JPEG</button>
+                    <button class="btn-secondary" onclick="resetPassportMaker()">Create Another Photo</button>
                 </div>
             </div>
         </section>
 
         <div class="loading" id="passportLoading" style="display: none;">
             <div class="spinner"></div>
-            <p data-en="Processing your photo..." data-hi="आपकी फोटो प्रोसेस हो रही है...">Processing your photo...</p>
+            <p>Processing your photo...</p>
+            <p style="font-size: 14px; color: #6b7280; margin-top: 10px;">First-time use may take 10-30 seconds as AI model loads</p>
         </div>
     </main>
 
@@ -152,6 +213,8 @@
             <p>&copy; 2025 Free Passport Maker. All rights reserved.</p>
         </div>
     </footer>
+
+    <div class="success-overlay" id="successOverlay"></div>
 
     <script src="{{ url_for('static', filename='js/passport.js') }}"></script>
     <script src="{{ url_for('static', filename='js/language.js') }}"></script>

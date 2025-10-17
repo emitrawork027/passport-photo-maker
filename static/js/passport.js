@@ -12,14 +12,48 @@ let posX = 0;
 let posY = 0;
 let currentBgColor = '#FFFFFF';
 let backgroundRemoved = false;
+let currentPhotoWidth = 1.2;
+let currentPhotoHeight = 1.4;
 
-// Passport dimensions: 1.2 inch x 1.4 inch at 300 DPI
-const PASSPORT_WIDTH = 1.2 * 300; // 360px
-const PASSPORT_HEIGHT = 1.4 * 300; // 420px
+// Initial canvas dimensions
+const PASSPORT_WIDTH = 1.2 * 300;
+const PASSPORT_HEIGHT = 1.4 * 300;
 
 passportCanvas.width = PASSPORT_WIDTH;
 passportCanvas.height = PASSPORT_HEIGHT;
 
+// Photo size selector
+document.getElementById('photoSizeSelect').addEventListener('change', function() {
+    const customInputs = document.getElementById('customSizeInputs');
+    if (this.value === 'custom') {
+        customInputs.style.display = 'block';
+        updateCanvasSize();
+    } else {
+        customInputs.style.display = 'none';
+        const [width, height] = this.value.split(',').map(parseFloat);
+        currentPhotoWidth = width;
+        currentPhotoHeight = height;
+        updateCanvasSize();
+    }
+});
+
+// Custom size inputs
+document.getElementById('customWidth').addEventListener('input', updateCanvasSize);
+document.getElementById('customHeight').addEventListener('input', updateCanvasSize);
+
+function updateCanvasSize() {
+    const sizeSelect = document.getElementById('photoSizeSelect');
+    if (sizeSelect.value === 'custom') {
+        currentPhotoWidth = parseFloat(document.getElementById('customWidth').value) || 1.2;
+        currentPhotoHeight = parseFloat(document.getElementById('customHeight').value) || 1.4;
+    }
+    
+    passportCanvas.width = currentPhotoWidth * 300;
+    passportCanvas.height = currentPhotoHeight * 300;
+    drawCanvas();
+}
+
+// Image upload
 passportImageInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -54,16 +88,23 @@ document.getElementById('posYSlider').addEventListener('input', (e) => {
     drawCanvas();
 });
 
-// Color buttons
+// Color buttons with active state
 document.querySelectorAll('.color-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        currentBgColor = btn.getAttribute('data-color');
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.color-btn').forEach(b => {
+            b.style.border = b.style.background === '#FFFFFF' || b.style.background.includes('#FFFFFF') ? '2px solid #e5e7eb' : 'none';
+        });
+        this.style.border = '3px solid #000';
+        currentBgColor = this.getAttribute('data-color');
         drawCanvas();
     });
 });
 
 document.getElementById('customColor').addEventListener('input', (e) => {
     currentBgColor = e.target.value;
+    document.querySelectorAll('.color-btn').forEach(b => {
+        b.style.border = b.style.background === '#FFFFFF' ? '2px solid #e5e7eb' : 'none';
+    });
     drawCanvas();
 });
 
@@ -102,15 +143,17 @@ document.getElementById('removeBackgroundBtn').addEventListener('click', async (
                 drawCanvas();
             };
             img.src = result.image;
+        } else {
+            throw new Error(result.message || 'Background removal failed');
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error removing background');
+        alert('Error removing background: ' + error.message);
         passportLoading.style.display = 'none';
     }
 });
 
-// Generate passport sheet
+// Generate passport sheet with confetti animation
 document.getElementById('generatePassportBtn').addEventListener('click', async () => {
     passportLoading.style.display = 'block';
 
@@ -138,7 +181,9 @@ document.getElementById('generatePassportBtn').addEventListener('click', async (
                 },
                 body: JSON.stringify({
                     image: result.image,
-                    format: 'png'
+                    format: 'png',
+                    width: currentPhotoWidth,
+                    height: currentPhotoHeight
                 })
             });
 
@@ -149,6 +194,9 @@ document.getElementById('generatePassportBtn').addEventListener('click', async (
                 passportLoading.style.display = 'none';
                 passportEditor.style.display = 'none';
                 passportFinal.style.display = 'block';
+                
+                // Show success animation with confetti
+                showSuccessAnimation();
             }
         }
     } catch (error) {
@@ -161,24 +209,27 @@ document.getElementById('generatePassportBtn').addEventListener('click', async (
 function drawCanvas() {
     if (!currentImage) return;
 
+    const canvasWidth = passportCanvas.width;
+    const canvasHeight = passportCanvas.height;
+
     ctx.fillStyle = currentBgColor;
-    ctx.fillRect(0, 0, PASSPORT_WIDTH, PASSPORT_HEIGHT);
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     const imgAspect = currentImage.width / currentImage.height;
-    const canvasAspect = PASSPORT_WIDTH / PASSPORT_HEIGHT;
+    const canvasAspect = canvasWidth / canvasHeight;
 
     let drawWidth, drawHeight;
 
     if (imgAspect > canvasAspect) {
-        drawHeight = PASSPORT_HEIGHT * zoom;
+        drawHeight = canvasHeight * zoom;
         drawWidth = drawHeight * imgAspect;
     } else {
-        drawWidth = PASSPORT_WIDTH * zoom;
+        drawWidth = canvasWidth * zoom;
         drawHeight = drawWidth / imgAspect;
     }
 
-    const x = (PASSPORT_WIDTH - drawWidth) / 2 + posX;
-    const y = (PASSPORT_HEIGHT - drawHeight) / 2 + posY;
+    const x = (canvasWidth - drawWidth) / 2 + posX;
+    const y = (canvasHeight - drawHeight) / 2 + posY;
 
     ctx.drawImage(currentImage, x, y, drawWidth, drawHeight);
 }
@@ -201,6 +252,10 @@ function resetPassportMaker() {
     posX = 0;
     posY = 0;
     backgroundRemoved = false;
+    currentPhotoWidth = 1.2;
+    currentPhotoHeight = 1.4;
+    document.getElementById('photoSizeSelect').value = '1.2,1.4';
+    document.getElementById('customSizeInputs').style.display = 'none';
 }
 
 function dataURItoBlob(dataURI) {
@@ -212,4 +267,51 @@ function dataURItoBlob(dataURI) {
         ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ab], { type: mimeString });
+}
+
+// Confetti animation functions
+function showSuccessAnimation() {
+    const overlay = document.getElementById('successOverlay');
+    
+    // Clear previous confetti
+    overlay.innerHTML = '';
+    
+    // Create confetti pieces
+    const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'orange', 'teal'];
+    for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = `confetti confetti-${colors[Math.floor(Math.random() * colors.length)]}`;
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        confetti.style.animationDelay = (Math.random() * 2) + 's';
+        overlay.appendChild(confetti);
+    }
+    
+    // Create success box
+    const successBox = document.createElement('div');
+    successBox.className = 'success-box';
+    successBox.innerHTML = `
+        <div class="success-emoji">🎉</div>
+        <h2 class="success-title">Passport Photo Ready!</h2>
+        <p class="success-message">
+            Your 4" x 6" sheet with 12 passport photos<br>
+            (${currentPhotoWidth}" x ${currentPhotoHeight}" each at 300 DPI) is ready!
+        </p>
+        <button class="success-btn" onclick="closeSuccessOverlay()">
+            <span>✓</span> Continue
+        </button>
+    `;
+    overlay.appendChild(successBox);
+    
+    // Show overlay
+    overlay.classList.add('active');
+    
+    // Auto-close after 5 seconds
+    setTimeout(() => {
+        closeSuccessOverlay();
+    }, 5000);
+}
+
+function closeSuccessOverlay() {
+    document.getElementById('successOverlay').classList.remove('active');
 }

@@ -273,37 +273,68 @@ def generate_passport_sheet():
         format_type = data.get('format', 'png')
         quality = data.get('quality', 'high')
         
+        # Get custom dimensions (in inches)
+        photo_width = float(data.get('width', 1.2))
+        photo_height = float(data.get('height', 1.4))
+        
+        print(f"Generating sheet with photo size: {photo_width}\" x {photo_height}\"")
+        
         if ',' in image_data:
             image_data = image_data.split(',')[1]
         
         img_bytes = base64.b64decode(image_data)
         passport_photo = Image.open(io.BytesIO(img_bytes))
         
-        passport_width = int(1.2 * 300)
-        passport_height = int(1.4 * 300)
+        # Calculate dimensions at 300 DPI
+        passport_width_px = int(photo_width * 300)
+        passport_height_px = int(photo_height * 300)
         
-        passport_photo = passport_photo.resize((passport_width, passport_height), Image.LANCZOS)
+        print(f"Photo dimensions: {passport_width_px}px x {passport_height_px}px")
         
-        sheet_width = int(4 * 300)
-        sheet_height = int(6 * 300)
+        passport_photo = passport_photo.resize((passport_width_px, passport_height_px), Image.LANCZOS)
+        
+        # Create 4x6 inch sheet at 300 DPI
+        sheet_width = int(4 * 300)  # 1200 pixels
+        sheet_height = int(6 * 300)  # 1800 pixels
         sheet = Image.new('RGB', (sheet_width, sheet_height), 'white')
         
+        # Calculate how many photos fit
         margin = 20
-        spacing_x = (sheet_width - (3 * passport_width) - (2 * margin)) // 4
-        spacing_y = (sheet_height - (4 * passport_height) - (2 * margin)) // 5
+        available_width = sheet_width - (2 * margin)
+        available_height = sheet_height - (2 * margin)
+        
+        cols = max(1, int(available_width / passport_width_px))
+        rows = max(1, int(available_height / passport_height_px))
+        
+        # Limit to 12 photos maximum
+        total_photos = min(cols * rows, 12)
+        
+        # Recalculate for even spacing
+        if cols * rows > 12:
+            # Try 3x4 layout for 12 photos
+            cols = 3
+            rows = 4
+        
+        print(f"Layout: {cols} cols x {rows} rows = {cols * rows} photos")
+        
+        spacing_x = (available_width - (cols * passport_width_px)) // (cols + 1) if cols > 1 else (available_width - passport_width_px) // 2
+        spacing_y = (available_height - (rows * passport_height_px)) // (rows + 1) if rows > 1 else (available_height - passport_height_px) // 2
         
         count = 0
-        for row in range(4):
-            for col in range(3):
-                x = margin + col * (passport_width + spacing_x)
-                y = margin + row * (passport_height + spacing_y)
+        for row in range(rows):
+            for col in range(cols):
+                if count >= 12:  # Stop at 12 photos
+                    break
+                x = margin + spacing_x + col * (passport_width_px + spacing_x)
+                y = margin + spacing_y + row * (passport_height_px + spacing_y)
                 sheet.paste(passport_photo, (x, y))
                 count += 1
-                if count >= 12:
-                    break
             if count >= 12:
                 break
         
+        print(f"Pasted {count} photos on sheet")
+        
+        # Save with quality settings
         buffered = io.BytesIO()
         if format_type == 'jpeg':
             if quality == 'high':
@@ -319,12 +350,16 @@ def generate_passport_sheet():
         
         return jsonify({
             'success': True,
-            'image': f'data:image/{format_type};base64,{img_str}'
+            'image': f'data:image/{format_type};base64,{img_str}',
+            'photos_count': count
         })
     
     except Exception as e:
         print(f"Error in generate_passport_sheet: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
+
 
 @app.route('/api/contact', methods=['POST'])
 def contact_form():
