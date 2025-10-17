@@ -110,7 +110,10 @@ document.getElementById('customColor').addEventListener('input', (e) => {
 
 // Remove background
 document.getElementById('removeBackgroundBtn').addEventListener('click', async () => {
-    if (!currentImage) return;
+    if (!currentImage) {
+        alert('Please upload an image first!');
+        return;
+    }
 
     passportLoading.style.display = 'block';
 
@@ -132,6 +135,10 @@ document.getElementById('removeBackgroundBtn').addEventListener('click', async (
             })()
         });
 
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
         const result = await response.json();
 
         if (result.success) {
@@ -141,24 +148,46 @@ document.getElementById('removeBackgroundBtn').addEventListener('click', async (
                 backgroundRemoved = true;
                 passportLoading.style.display = 'none';
                 drawCanvas();
+                alert('Background removed successfully! ✓');
             };
             img.src = result.image;
         } else {
-            throw new Error(result.message || 'Background removal failed');
+            throw new Error(result.message || result.error || 'Background removal failed');
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error removing background: ' + error.message);
         passportLoading.style.display = 'none';
+        
+        let errorMessage = 'Error removing background. ';
+        if (error.message.includes('quota')) {
+            errorMessage += 'Monthly API limit reached. Try again next month.';
+        } else if (error.message.includes('Server error')) {
+            errorMessage += 'Server is busy. Please try again.';
+        } else {
+            errorMessage += error.message;
+        }
+        
+        alert(errorMessage);
     }
 });
 
 // Generate passport sheet with confetti animation
 document.getElementById('generatePassportBtn').addEventListener('click', async () => {
+    if (!currentImage) {
+        alert('Please upload an image first!');
+        return;
+    }
+
     passportLoading.style.display = 'block';
 
     try {
+        // Draw current canvas state
+        drawCanvas();
+        
+        // Get canvas data as PNG
         const imageData = passportCanvas.toDataURL('image/png');
+
+        console.log('Sending image data to server...');
 
         const response = await fetch('/api/process-passport', {
             method: 'POST',
@@ -171,38 +200,75 @@ document.getElementById('generatePassportBtn').addEventListener('click', async (
             })
         });
 
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
         const result = await response.json();
 
-        if (result.success) {
-            const sheetResponse = await fetch('/api/generate-passport-sheet', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    image: result.image,
-                    format: 'png',
-                    width: currentPhotoWidth,
-                    height: currentPhotoHeight
-                })
-            });
-
-            const sheetResult = await sheetResponse.json();
-
-            if (sheetResult.success) {
-                document.getElementById('finalPassportSheet').src = sheetResult.image;
-                passportLoading.style.display = 'none';
-                passportEditor.style.display = 'none';
-                passportFinal.style.display = 'block';
-                
-                // Show success animation with confetti
-                showSuccessAnimation();
-            }
+        if (!result.success) {
+            throw new Error(result.error || 'Processing failed');
         }
+
+        console.log('Image processed, generating sheet...');
+
+        const sheetResponse = await fetch('/api/generate-passport-sheet', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                image: result.image,
+                format: 'png',
+                width: currentPhotoWidth,
+                height: currentPhotoHeight
+            })
+        });
+
+        if (!sheetResponse.ok) {
+            throw new Error(`Sheet generation error: ${sheetResponse.status}`);
+        }
+
+        const sheetResult = await sheetResponse.json();
+
+        if (!sheetResult.success) {
+            throw new Error(sheetResult.error || 'Sheet generation failed');
+        }
+
+        console.log('Sheet generated successfully!');
+
+        document.getElementById('finalPassportSheet').src = sheetResult.image;
+        passportLoading.style.display = 'none';
+        passportEditor.style.display = 'none';
+        passportFinal.style.display = 'block';
+        
+        // Show success animation with confetti
+        showSuccessAnimation();
+        
     } catch (error) {
         console.error('Error:', error);
-        alert('Error generating passport sheet');
         passportLoading.style.display = 'none';
+        
+        // Better error messages
+        let errorMessage = 'Error generating passport sheet.\n\n';
+        
+        if (error.message.includes('Server error')) {
+            errorMessage += 'Server is busy. Please try again in a moment.';
+        } else if (error.message.includes('Sheet generation')) {
+            errorMessage += 'Try the following:\n';
+            errorMessage += '• Remove background first for best results\n';
+            errorMessage += '• Use a smaller image (< 5MB)\n';
+            errorMessage += '• Try a different photo size';
+        } else if (error.message.includes('Processing failed')) {
+            errorMessage += 'Image processing failed. Try:\n';
+            errorMessage += '• Removing background first\n';
+            errorMessage += '• Using a different image\n';
+            errorMessage += '• Refreshing the page';
+        } else {
+            errorMessage += error.message;
+        }
+        
+        alert(errorMessage);
     }
 });
 
@@ -237,7 +303,7 @@ function drawCanvas() {
 function downloadPassport(format) {
     const img = document.getElementById('finalPassportSheet');
     const link = document.createElement('a');
-    link.download = `passport-photo-sheet.${format}`;
+    link.download = `passport-photo-sheet-${Date.now()}.${format}`;
     link.href = img.src;
     link.click();
 }
@@ -254,8 +320,12 @@ function resetPassportMaker() {
     backgroundRemoved = false;
     currentPhotoWidth = 1.2;
     currentPhotoHeight = 1.4;
+    currentBgColor = '#FFFFFF';
     document.getElementById('photoSizeSelect').value = '1.2,1.4';
     document.getElementById('customSizeInputs').style.display = 'none';
+    document.getElementById('zoomSlider').value = 1;
+    document.getElementById('posXSlider').value = 0;
+    document.getElementById('posYSlider').value = 0;
 }
 
 function dataURItoBlob(dataURI) {

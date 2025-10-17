@@ -360,6 +360,117 @@ def generate_passport_sheet():
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/generate-joint-sheet', methods=['POST'])
+def generate_joint_sheet():
+    """Generate joint photo sheet - 8 photos of 1.9x1.4 inches on 4x6 sheet"""
+    try:
+        print("=" * 50)
+        print("JOINT PHOTO SHEET GENERATION STARTED")
+        print("=" * 50)
+        
+        data = request.get_json()
+        image_data = data.get('image')
+        format_type = data.get('format', 'png')
+        quality = data.get('quality', 'high')
+        
+        # Fixed dimensions for joint photos
+        photo_width = 1.9  # inches
+        photo_height = 1.4  # inches
+        
+        print(f"Joint photo size: {photo_width}\" x {photo_height}\"")
+        print(f"Format: {format_type}, Quality: {quality}")
+        
+        if ',' in image_data:
+            image_data = image_data.split(',')[1]
+        
+        img_bytes = base64.b64decode(image_data)
+        joint_photo = Image.open(io.BytesIO(img_bytes))
+        
+        print(f"Original image size: {joint_photo.size}")
+        
+        # Calculate dimensions at 300 DPI
+        photo_width_px = int(photo_width * 300)  # 570 pixels
+        photo_height_px = int(photo_height * 300)  # 420 pixels
+        
+        print(f"Photo dimensions: {photo_width_px}px x {photo_height_px}px")
+        
+        # Resize photo
+        joint_photo = joint_photo.resize((photo_width_px, photo_height_px), Image.LANCZOS)
+        
+        # Create 4x6 inch sheet at 300 DPI
+        sheet_width = int(4 * 300)  # 1200 pixels
+        sheet_height = int(6 * 300)  # 1800 pixels
+        sheet = Image.new('RGB', (sheet_width, sheet_height), 'white')
+        
+        print(f"Sheet size: {sheet_width}px x {sheet_height}px")
+        
+        # Layout: 2 columns x 4 rows = 8 photos
+        cols = 2
+        rows = 4
+        
+        # Calculate spacing
+        margin = 15
+        available_width = sheet_width - (2 * margin)
+        available_height = sheet_height - (2 * margin)
+        
+        spacing_x = (available_width - (cols * photo_width_px)) // (cols + 1)
+        spacing_y = (available_height - (rows * photo_height_px)) // (rows + 1)
+        
+        print(f"Layout: {cols} cols x {rows} rows = 8 photos")
+        print(f"Spacing - X: {spacing_x}px, Y: {spacing_y}px")
+        
+        # Paste photos on sheet
+        count = 0
+        for row in range(rows):
+            for col in range(cols):
+                x = margin + spacing_x + col * (photo_width_px + spacing_x)
+                y = margin + spacing_y + row * (photo_height_px + spacing_y)
+                
+                print(f"Photo {count + 1}: Position ({x}, {y})")
+                
+                sheet.paste(joint_photo, (x, y))
+                count += 1
+        
+        print(f"Total photos pasted: {count}")
+        
+        # Save with quality settings
+        buffered = io.BytesIO()
+        
+        if format_type == 'jpeg':
+            if quality == 'high':
+                sheet.save(buffered, format="JPEG", quality=95, dpi=(300, 300))
+            elif quality == 'medium':
+                sheet.save(buffered, format="JPEG", quality=85, dpi=(300, 300))
+            else:
+                sheet.save(buffered, format="JPEG", quality=70, dpi=(300, 300))
+        else:
+            sheet.save(buffered, format="PNG", dpi=(300, 300))
+        
+        output_size = len(buffered.getvalue()) / (1024 * 1024)
+        print(f"Output file size: {output_size:.2f} MB")
+        
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+        
+        print("SUCCESS! Joint sheet generated")
+        print("=" * 50)
+        
+        return jsonify({
+            'success': True,
+            'image': f'data:image/{format_type};base64,{img_str}',
+            'photos_count': count
+        })
+    
+    except Exception as e:
+        print("=" * 50)
+        print(f"ERROR in generate_joint_sheet: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 50)
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 
 @app.route('/api/contact', methods=['POST'])
 def contact_form():

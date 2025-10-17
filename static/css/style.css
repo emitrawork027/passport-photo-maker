@@ -1134,3 +1134,398 @@ footer {
         text-align: center;
     }
 }
+/* ============================================
+   PASSPORT TIPS SECTION STYLING
+   ============================================ */
+
+.passport-tips-section {
+    animation: fadeIn 0.8s ease-in;
+}
+
+.passport-tips-section .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Tip Cards Hover Effect */
+.passport-tips-section > div > div > div {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.passport-tips-section > div > div > div:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ============================================
+   VIDEO TUTORIAL SECTION
+   ============================================ */
+
+.video-tutorial-section {
+    animation: fadeIn 1s ease-in;
+}
+
+.video-tutorial-section iframe {
+    border-radius: 12px;
+}
+
+.video-tutorial-section ol {
+    padding-left: 25px;
+}
+
+.video-tutorial-section ol li {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+/* ============================================
+   PRINT INSTRUCTIONS STYLING (ENHANCED)
+   ============================================ */
+
+.instruction-step {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.instruction-step:hover {
+    border-color: #0ea5e9;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.warning-step .step-number {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+}
+
+.success-step .step-number {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.step-text {
+    flex: 1;
+    margin: 0;
+    color: #374151;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.pro-tip {
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 12px;
+    border: 2px solid #fbbf24;
+}
+
+.pro-tip p {
+    margin: 0;
+    color: #78350f;
+    font-size: 16px;
+}
+
+/* ============================================
+   SHEET TYPE BUTTONS STYLING
+   ============================================ */
+
+.sheet-type-btn {
+    transition: all 0.3s ease;
+}
+
+.sheet-type-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.sheet-type-btn.active {
+    animation: pulse 0.5s ease;
+}
+
+/* ============================================
+   SHARE BUTTONS STYLING
+   ============================================ */
+
+.share-buttons a {
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.share-buttons a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - MOBILE OPTIMIZATION
+   ============================================ */
+
+@media (max-width: 768px) {
+    .passport-tips-section h2,
+    .video-tutorial-section h2 {
+        font-size: 24px !important;
+    }
+    
+    .passport-tips-section > div > div {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .instruction-step {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .video-tutorial-section ol {
+        font-size: 14px;
+    }
+    
+    /* Sheet Type Buttons Mobile */
+    .sheet-type-btn {
+        padding: 12px !important;
+        font-size: 13px !important;
+    }
+    
+    .sheet-type-btn > div:first-child {
+        font-size: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .share-buttons {
+        flex-direction: column !important;
+    }
+    
+    .share-buttons a {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* ============================================
+   SMOOTH SCROLLING
+   ============================================ */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ============================================
+   FINAL SECTION ENHANCEMENTS
+   ============================================ */
+
+.final-preview {
+    animation: fadeIn 0.8s ease-in;
+}
+
+.download-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.btn-download,
+.btn-secondary {
+    transition: all 0.3s ease;
+}
+
+.btn-download:hover,
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   LOADING SPINNER ENHANCEMENT
+   ============================================ */
+
+.loading {
+    backdrop-filter: blur(5px);
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ============================================
+   CANVAS CONTAINER STYLING
+   ============================================ */
+
+.canvas-container {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+.canvas-container canvas {
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   QUALITY SELECTOR STYLING
+   ============================================ */
+
+.quality-selector {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.quality-selector label {
+    font-weight: 600;
+    color: #374151;
+    margin-right: 10px;
+}
+
+.quality-selector select {
+    padding: 10px 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.quality-selector select:hover {
+    border-color: #0ea5e9;
+}
+
+.quality-selector select:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+/* ============================================
+   CONTROL GROUP STYLING
+   ============================================ */
+
+.control-group {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+}
+
+.control-group h4 {
+    margin: 0 0 15px 0;
+    color: #0c4a6e;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.control-group label {
+    display: block;
+    margin: 15px 0 8px 0;
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+}
+
+.control-group input[type="range"] {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+}
+
+.control-group input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+    border: none;
+}
+
+/* ============================================
+   GENERATE SECTION STYLING
+   ============================================ */
+
+.generate-section {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.btn-large {
+    padding: 18px 40px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-large:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
