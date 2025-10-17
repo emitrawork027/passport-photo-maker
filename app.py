@@ -76,6 +76,159 @@ def contact():
 @app.route('/about')
 def about():
     return render_template('about.html')
+@app.route('/api/remove-background', methods=['POST'])
+def remove_background():
+    """Background removal using remove.bg API"""
+    try:
+        print("=" * 50)
+        print("BACKGROUND REMOVAL REQUEST RECEIVED")
+        print("=" * 50)
+        
+        if 'image' not in request.files:
+            print("ERROR: No image in request")
+            return jsonify({'error': 'No image provided'}), 400
+        
+        file = request.files['image']
+        quality = request.form.get('quality', 'high')
+        
+        print(f"File name: {file.filename}")
+        print(f"Quality: {quality}")
+        
+        if file.filename == '':
+            print("ERROR: Empty filename")
+            return jsonify({'error': 'No selected file'}), 400
+        
+        if file and allowed_file(file.filename):
+            # Read file
+            file_content = file.read()
+            file_size = len(file_content) / (1024 * 1024)
+            
+            print(f"File size: {file_size:.2f} MB")
+            print(f"API Key present: {bool(REMOVEBG_API_KEY)}")
+            print(f"API Key (first 10 chars): {REMOVEBG_API_KEY[:10]}...")
+            
+            # Check file size
+            if file_size > 12:
+                print("ERROR: File too large")
+                return jsonify({
+                    'error': 'Image too large',
+                    'message': 'Please use an image smaller than 12MB'
+                }), 400
+            
+            try:
+                print("\n>>> Calling remove.bg API...")
+                print(f">>> Endpoint: https://api.remove.bg/v1.0/removebg")
+                print(f">>> Timeout: 90 seconds")
+                
+                # Call API
+                import time
+                start_time = time.time()
+                
+                response = requests.post(
+                    'https://api.remove.bg/v1.0/removebg',
+                    files={'image_file': file_content},
+                    data={'size': 'auto'},
+                    headers={'X-Api-Key': REMOVEBG_API_KEY},
+                    timeout=90
+                )
+                
+                elapsed_time = time.time() - start_time
+                
+                print(f">>> Response received in {elapsed_time:.2f} seconds")
+                print(f">>> Status Code: {response.status_code}")
+                print(f">>> Response Headers: {dict(response.headers)}")
+                
+                if response.status_code == 200:
+                    print(">>> SUCCESS! Processing image...")
+                    
+                    # Process image
+                    img = Image.open(io.BytesIO(response.content))
+                    print(f">>> Image size: {img.size}")
+                    print(f">>> Image mode: {img.mode}")
+                    
+                    # Apply quality settings
+                    buffered = io.BytesIO()
+                    
+                    if quality == 'high':
+                        img.save(buffered, format="PNG", optimize=False)
+                    elif quality == 'medium':
+                        img = img.resize(
+                            (int(img.width * 0.75), int(img.height * 0.75)), 
+                            Image.LANCZOS
+                        )
+                        img.save(buffered, format="PNG", optimize=True)
+                    else:
+                        img = img.resize(
+                            (int(img.width * 0.5), int(img.height * 0.5)), 
+                            Image.LANCZOS
+                        )
+                        img.save(buffered, format="PNG", optimize=True)
+                    
+                    output_size = len(buffered.getvalue()) / (1024 * 1024)
+                    print(f">>> Output size: {output_size:.2f} MB")
+                    
+                    output_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                    
+                    print(">>> Sending response to client")
+                    print("=" * 50)
+                    
+                    return jsonify({
+                        'success': True,
+                        'image': f'data:image/png;base64,{output_base64}'
+                    })
+                
+                else:
+                    print(f">>> ERROR: API returned {response.status_code}")
+                    print(f">>> Response body: {response.text[:500]}")
+                    
+                    if response.status_code == 403:
+                        return jsonify({
+                            'error': 'API quota exceeded',
+                            'message': 'Free API limit (50 images/month) reached.'
+                        }), 403
+                    elif response.status_code == 402:
+                        return jsonify({
+                            'error': 'Credits exhausted',
+                            'message': 'Remove.bg API credits used up.'
+                        }), 402
+                    else:
+                        return jsonify({
+                            'error': 'API error',
+                            'message': f'Service error: {response.status_code}'
+                        }), response.status_code
+                    
+            except requests.exceptions.Timeout as timeout_err:
+                print(f">>> TIMEOUT ERROR: {str(timeout_err)}")
+                return jsonify({
+                    'error': 'Request timeout',
+                    'message': 'Processing took too long. Try smaller image.'
+                }), 504
+            
+            except requests.exceptions.ConnectionError as conn_err:
+                print(f">>> CONNECTION ERROR: {str(conn_err)}")
+                return jsonify({
+                    'error': 'Connection error',
+                    'message': 'Cannot connect to removal service.'
+                }), 503
+            
+            except Exception as api_error:
+                print(f">>> EXCEPTION: {str(api_error)}")
+                import traceback
+                traceback.print_exc()
+                return jsonify({
+                    'error': 'Processing error',
+                    'message': str(api_error)
+                }), 500
+        
+        print("ERROR: Invalid file type")
+        return jsonify({'error': 'Invalid file type'}), 400
+    
+    except Exception as e:
+        print(f"FATAL ERROR: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
 
 # [PASTE THE REMOVE-BACKGROUND FUNCTION FROM ABOVE HERE]
 
