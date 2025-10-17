@@ -88,84 +88,86 @@
       }
     }
     </script>
+    
     <!-- FAQ Schema -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+    <script type="application/ld+json">
     {
-      "@type": "Question",
-      "name": "What is the correct passport photo size for India?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "For Indian passport, the photo size should be 35mm x 45mm (1.38 inches x 1.77 inches) or 1.2 inches x 1.4 inches. Our tool creates photos at 300 DPI for perfect printing quality."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How many passport photos come in one sheet?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Our 4x6 inch sheet contains 12 passport photos for single photos and 8 photos for joint photos (couple/family photos). Each photo is at 300 DPI quality."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can I remove the background of my passport photo?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes, our tool includes AI-powered background removal. Simply upload your photo, click 'Remove Background', and choose from 8+ background colors including white, blue, gray, and red."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is this passport photo maker really free?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes, our passport photo maker is 100% free. You can create unlimited passport photos, use AI background removal (50 free uses per month), and download in PNG or JPEG format without any charges."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What countries' passport sizes are supported?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "We support India (35x45mm), USA (51x51mm), UK (35x45mm), and custom sizes. You can also create visa photos and joint photos for couples or families."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How do I print passport photos correctly?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Download the photo sheet, print on 4x6 inch glossy photo paper (200-300 GSM), and use 'Actual Size' or '100% Scale' setting. Do NOT use 'Fit to Page'. Local photo shops print for ₹10-30 per sheet."
-      }
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the correct passport photo size for India?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For Indian passport, the photo size should be 35mm x 45mm (1.38 inches x 1.77 inches) or 1.2 inches x 1.4 inches. Our tool creates photos at 300 DPI for perfect printing quality."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many passport photos come in one sheet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Our 4x6 inch sheet contains 12 passport photos for single photos and 8 photos for joint photos (couple/family photos). Each photo is at 300 DPI quality."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I remove the background of my passport photo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, our tool includes AI-powered background removal. Simply upload your photo, click 'Remove Background', and choose from 8+ background colors including white, blue, gray, and red."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this passport photo maker really free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, our passport photo maker is 100% free. You can create unlimited passport photos, use AI background removal (50 free uses per month), and download in PNG or JPEG format without any charges."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What countries' passport sizes are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We support India (35x45mm), USA (51x51mm), UK (35x45mm), and custom sizes. You can also create visa photos and joint photos for couples or families."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I print passport photos correctly?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Download the photo sheet, print on 4x6 inch glossy photo paper (200-300 GSM), and use 'Actual Size' or '100% Scale' setting. Do NOT use 'Fit to Page'. Local photo shops print for ₹10-30 per sheet."
+          }
+        }
+      ]
     }
-  ]
-}
-</script>
-<!-- Breadcrumb Schema -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
+    </script>
+    
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
     {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "https://passport-photo-maker-4.onrender.com/"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Passport Maker",
-      "item": "https://passport-photo-maker-4.onrender.com/passport-maker"
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://passport-photo-maker-4.onrender.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Passport Maker",
+          "item": "https://passport-photo-maker-4.onrender.com/passport-maker"
+        }
+      ]
     }
-  ]
-}
-</script>
+    </script>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -252,7 +254,7 @@
                     </div>
 
                     <div class="controls-area">
-                        <!-- SHEET TYPE SELECTOR (NEW) -->
+                        <!-- SHEET TYPE SELECTOR -->
                         <div class="control-group">
                             <h4>Sheet Type</h4>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
@@ -398,6 +400,17 @@
                     <button class="btn-download" onclick="downloadPassport('jpeg')" type="button">⬇️ Download JPEG</button>
                     <button class="btn-secondary" onclick="resetPassportMaker()" type="button">➕ Create Another Photo</button>
                 </div>
+
+                <!-- Share Section -->
+                <div style="margin-top: 30px; text-align: center; padding: 25px; background: #f9fafb; border-radius: 12px;">
+                    <h3 style="margin-bottom: 15px; color: #0c4a6e;">Share with Friends & Family</h3>
+                    <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=https://passport-photo-maker-4.onrender.com/passport-maker" target="_blank" style="padding: 12px 20px; background: #1877f2; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">📘 Facebook</a>
+                        <a href="https://twitter.com/intent/tweet?url=https://passport-photo-maker-4.onrender.com/passport-maker&text=Create%20FREE%20passport%20photos%20online%20with%20AI%20background%20removal!" target="_blank" style="padding: 12px 20px; background: #1da1f2; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">🐦 Twitter</a>
+                        <a href="https://wa.me/?text=Check%20out%20this%20FREE%20passport%20photo%20maker%20with%20AI%20background%20removal!%20https://passport-photo-maker-4.onrender.com/passport-maker" target="_blank" style="padding: 12px 20px; background: #25d366; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">💬 WhatsApp</a>
+                        <a href="mailto:?subject=Free Passport Photo Maker&body=Create FREE passport photos online: https://passport-photo-maker-4.onrender.com/passport-maker" style="padding: 12px 20px; background: #6b7280; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">📧 Email</a>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -407,66 +420,85 @@
             <p style="font-size: 14px; color: #6b7280; margin-top: 10px;">First-time use may take 10-30 seconds as AI model loads</p>
         </div>
     </main>
-<!-- Blog/Tips Section -->
-<section class="passport-tips-section" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 60px 0;">
-    <div class="container">
-        <h2 style="text-align: center; margin-bottom: 40px; font-size: 32px; color: #0c4a6e;">📚 Passport Photo Tips & Guide</h2>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
-            <!-- Tip 1 -->
-            <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <div style="font-size: 40px; margin-bottom: 15px;">📏</div>
-                <h3 style="color: #0c4a6e; margin-bottom: 10px;">Correct Photo Sizes</h3>
-                <p style="color: #6b7280; line-height: 1.6;">India passport: 35x45mm (1.2"x1.4"), USA: 51x51mm (2"x2"), UK: 35x45mm. Always check official requirements before submission.</p>
-            </div>
+
+    <!-- Blog/Tips Section -->
+    <section class="passport-tips-section" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 60px 0;">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 40px; font-size: 32px; color: #0c4a6e;">📚 Passport Photo Tips & Guide</h2>
             
-            <!-- Tip 2 -->
-            <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <div style="font-size: 40px; margin-bottom: 15px;">💡</div>
-                <h3 style="color: #0c4a6e; margin-bottom: 10px;">Lighting & Background</h3>
-                <p style="color: #6b7280; line-height: 1.6;">Use natural daylight, plain white or light blue background. Avoid shadows on face and background. Our AI removes background automatically.</p>
-            </div>
-            
-            <!-- Tip 3 -->
-            <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <div style="font-size: 40px; margin-bottom: 15px;">👔</div>
-                <h3 style="color: #0c4a6e; margin-bottom: 10px;">Dress Code</h3>
-                <p style="color: #6b7280; line-height: 1.6;">Wear formal attire with contrast to background. Avoid white clothes on white background. No uniforms or hats (except religious).</p>
-            </div>
-            
-            <!-- Tip 4 -->
-            <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <div style="font-size: 40px; margin-bottom: 15px;">😊</div>
-                <h3 style="color: #0c4a6e; margin-bottom: 10px;">Facial Expression</h3>
-                <p style="color: #6b7280; line-height: 1.6;">Neutral expression, both eyes open, mouth closed. Look directly at camera. Remove glasses unless worn daily for medical reasons.</p>
-            </div>
-            
-            <!-- Tip 5 -->
-            <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <div style="font-size: 40px; margin-bottom: 15px;">🖨️</div>
-                <h3 style="color: #0c4a6e; margin-bottom: 10px;">Printing Quality</h3>
-                <p style="color: #6b7280; line-height: 1.6;">Use high-quality glossy photo paper (200-300 GSM). Print at actual size (100% scale). Local photo shops charge ₹10-30 per 4x6 sheet.</p>
-            </div>
-            
-            <!-- Tip 6 -->
-            <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <div style="font-size: 40px; margin-bottom: 15px;">⚡</div>
-                <h3 style="color: #0c4a6e; margin-bottom: 10px;">Quick Tips</h3>
-                <p style="color: #6b7280; line-height: 1.6;">Hair should be neat, ears visible. Keep head straight, not tilted. Recent photo (within 6 months). 80% face coverage in frame.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div style="font-size: 40px; margin-bottom: 15px;">📏</div>
+                    <h3 style="color: #0c4a6e; margin-bottom: 10px;">Correct Photo Sizes</h3>
+                    <p style="color: #6b7280; line-height: 1.6;">India passport: 35x45mm (1.2"x1.4"), USA: 51x51mm (2"x2"), UK: 35x45mm. Always check official requirements before submission.</p>
+                </div>
+                
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div style="font-size: 40px; margin-bottom: 15px;">💡</div>
+                    <h3 style="color: #0c4a6e; margin-bottom: 10px;">Lighting & Background</h3>
+                    <p style="color: #6b7280; line-height: 1.6;">Use natural daylight, plain white or light blue background. Avoid shadows on face and background. Our AI removes background automatically.</p>
+                </div>
+                
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div style="font-size: 40px; margin-bottom: 15px;">👔</div>
+                    <h3 style="color: #0c4a6e; margin-bottom: 10px;">Dress Code</h3>
+                    <p style="color: #6b7280; line-height: 1.6;">Wear formal attire with contrast to background. Avoid white clothes on white background. No uniforms or hats (except religious).</p>
+                </div>
+                
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div style="font-size: 40px; margin-bottom: 15px;">😊</div>
+                    <h3 style="color: #0c4a6e; margin-bottom: 10px;">Facial Expression</h3>
+                    <p style="color: #6b7280; line-height: 1.6;">Neutral expression, both eyes open, mouth closed. Look directly at camera. Remove glasses unless worn daily for medical reasons.</p>
+                </div>
+                
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div style="font-size: 40px; margin-bottom: 15px;">🖨️</div>
+                    <h3 style="color: #0c4a6e; margin-bottom: 10px;">Printing Quality</h3>
+                    <p style="color: #6b7280; line-height: 1.6;">Use high-quality glossy photo paper (200-300 GSM). Print at actual size (100% scale). Local photo shops charge ₹10-30 per 4x6 sheet.</p>
+                </div>
+                
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div style="font-size: 40px; margin-bottom: 15px;">⚡</div>
+                    <h3 style="color: #0c4a6e; margin-bottom: 10px;">Quick Tips</h3>
+                    <p style="color: #6b7280; line-height: 1.6;">Hair should be neat, ears visible. Keep head straight, not tilted. Recent photo (within 6 months). 80% face coverage in frame.</p>
+                </div>
             </div>
         </div>
-    </div>
-</section>
-<!-- Share Section -->
-<div style="margin-top: 30px; text-align: center; padding: 25px; background: #f9fafb; border-radius: 12px;">
-    <h3 style="margin-bottom: 15px; color: #0c4a6e;">Share with Friends & Family</h3>
-    <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-        <a href="https://www.facebook.com/sharer/sharer.php?u=https://passport-photo-maker-4.onrender.com/passport-maker" target="_blank" style="padding: 12px 20px; background: #1877f2; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">📘 Facebook</a>
-        <a href="https://twitter.com/intent/tweet?url=https://passport-photo-maker-4.onrender.com/passport-maker&text=Create%20FREE%20passport%20photos%20online%20with%20AI%20background%20removal!" target="_blank" style="padding: 12px 20px; background: #1da1f2; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">🐦 Twitter</a>
-        <a href="https://wa.me/?text=Check%20out%20this%20FREE%20passport%20photo%20maker%20with%20AI%20background%20removal!%20https://passport-photo-maker-4.onrender.com/passport-maker" target="_blank" style="padding: 12px 20px; background: #25d366; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">💬 WhatsApp</a>
-        <a href="mailto:?subject=Free Passport Photo Maker&body=Create FREE passport photos online: https://passport-photo-maker-4.onrender.com/passport-maker" style="padding: 12px 20px; background: #6b7280; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">📧 Email</a>
-    </div>
-</div>
+    </section>
+
+    <!-- Video Tutorial Section -->
+    <section class="video-tutorial-section" style="padding: 60px 0; background: white;">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 40px; font-size: 32px; color: #0c4a6e;">📹 How to Use - Video Tutorial</h2>
+            
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
+                    <iframe 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                        title="How to Create Passport Photos Online - Free Passport Maker Tutorial" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center;">
+                    <h3 style="color: #0c4a6e; margin-bottom: 15px;">Step-by-Step Guide</h3>
+                    <ol style="text-align: left; max-width: 600px; margin: 0 auto; color: #6b7280; line-height: 2;">
+                        <li>Upload your photo (JPEG, PNG, or WEBP)</li>
+                        <li>Choose sheet type (Single or Joint photo)</li>
+                        <li>Select photo size (India, USA, UK, or custom)</li>
+                        <li>Adjust zoom and position to fit frame</li>
+                        <li>Remove background using AI (optional)</li>
+                        <li>Choose background color (8+ options)</li>
+                        <li>Generate photo sheet (12 or 8 photos)</li>
+                        <li>Download and print on 4x6 inch paper</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <footer>
         <div class="container">

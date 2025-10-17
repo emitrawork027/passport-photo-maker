@@ -493,26 +493,66 @@ Sitemap: https://passport-photo-maker-4.onrender.com/sitemap.xml
 
 @app.route('/sitemap.xml')
 def sitemap():
+    from datetime import datetime
+    today = datetime.now().strftime('%Y-%m-%d')
+    
     pages = [
-        {'loc': '/', 'priority': '1.0', 'changefreq': 'daily'},
-        {'loc': '/passport-maker', 'priority': '0.8', 'changefreq': 'weekly'},
-        {'loc': '/about', 'priority': '0.5', 'changefreq': 'monthly'},
-        {'loc': '/contact', 'priority': '0.5', 'changefreq': 'monthly'},
+        {
+            'loc': '/', 
+            'lastmod': today,
+            'priority': '1.0', 
+            'changefreq': 'daily'
+        },
+        {
+            'loc': '/passport-maker', 
+            'lastmod': today,
+            'priority': '0.9', 
+            'changefreq': 'daily'
+        },
+        {
+            'loc': '/about', 
+            'lastmod': today,
+            'priority': '0.5', 
+            'changefreq': 'monthly'
+        },
+        {
+            'loc': '/contact', 
+            'lastmod': today,
+            'priority': '0.5', 
+            'changefreq': 'monthly'
+        },
     ]
     
     sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
-    sitemap_xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    sitemap_xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+    sitemap_xml += 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+    sitemap_xml += 'xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 '
+    sitemap_xml += 'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">\n'
     
     for page in pages:
-        sitemap_xml += f'  <url>\n'
+        sitemap_xml += '  <url>\n'
         sitemap_xml += f'    <loc>https://passport-photo-maker-4.onrender.com{page["loc"]}</loc>\n'
+        sitemap_xml += f'    <lastmod>{page["lastmod"]}</lastmod>\n'
         sitemap_xml += f'    <priority>{page["priority"]}</priority>\n'
         sitemap_xml += f'    <changefreq>{page["changefreq"]}</changefreq>\n'
-        sitemap_xml += f'  </url>\n'
+        sitemap_xml += '  </url>\n'
     
     sitemap_xml += '</urlset>'
     
-    return sitemap_xml, 200, {'Content-Type': 'application/xml'}
+    return sitemap_xml, 200, {'Content-Type': 'application/xml; charset=utf-8'}
+
+@app.route('/robots.txt')
+def robots():
+    robots_txt = """User-agent: *
+Allow: /
+Allow: /passport-maker
+Allow: /about
+Allow: /contact
+
+Sitemap: https://passport-photo-maker-4.onrender.com/sitemap.xml
+"""
+    return robots_txt, 200, {'Content-Type': 'text/plain'}
+
 
 @app.errorhandler(404)
 def not_found(error):

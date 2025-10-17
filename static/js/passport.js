@@ -14,6 +14,7 @@ let currentBgColor = '#FFFFFF';
 let backgroundRemoved = false;
 let currentPhotoWidth = 1.2;
 let currentPhotoHeight = 1.4;
+let sheetType = 'normal'; // ← YEH NAYI LINE
 
 // Initial canvas dimensions
 const PASSPORT_WIDTH = 1.2 * 300;
@@ -51,6 +52,36 @@ function updateCanvasSize() {
     passportCanvas.width = currentPhotoWidth * 300;
     passportCanvas.height = currentPhotoHeight * 300;
     drawCanvas();
+}
+
+// Sheet type selector function - YEH NAYI FUNCTION
+window.selectSheetType = function(type) {
+    sheetType = type;
+    
+    const normalBtn = document.getElementById('normalSheetBtn');
+    const jointBtn = document.getElementById('jointSheetBtn');
+    const photoSizeSelect = document.getElementById('photoSizeSelect');
+    const sheetTypeInfo = document.getElementById('sheetTypeInfo');
+    
+    if (type === 'normal') {
+        normalBtn.style.border = '3px solid #10b981';
+        normalBtn.style.background = '#f0fdf4';
+        jointBtn.style.border = '2px solid #e5e7eb';
+        jointBtn.style.background = 'white';
+        photoSizeSelect.disabled = false;
+        sheetTypeInfo.innerHTML = '💡 Single photos - Choose from passport, visa, or custom sizes';
+    } else {
+        jointBtn.style.border = '3px solid #3b82f6';
+        jointBtn.style.background = '#eff6ff';
+        normalBtn.style.border = '2px solid #e5e7eb';
+        normalBtn.style.background = 'white';
+        photoSizeSelect.disabled = true;
+        photoSizeSelect.value = '1.9,1.4';
+        currentPhotoWidth = 1.9;
+        currentPhotoHeight = 1.4;
+        updateCanvasSize();
+        sheetTypeInfo.innerHTML = '💡 Joint photos fixed at 1.9" x 1.4" - 8 photos per sheet';
+    }
 }
 
 // Image upload
@@ -171,7 +202,7 @@ document.getElementById('removeBackgroundBtn').addEventListener('click', async (
     }
 });
 
-// Generate passport sheet with confetti animation
+// Generate passport sheet with confetti animation - YEH UPDATED HAI
 document.getElementById('generatePassportBtn').addEventListener('click', async () => {
     if (!currentImage) {
         alert('Please upload an image first!');
@@ -181,10 +212,7 @@ document.getElementById('generatePassportBtn').addEventListener('click', async (
     passportLoading.style.display = 'block';
 
     try {
-        // Draw current canvas state
         drawCanvas();
-        
-        // Get canvas data as PNG
         const imageData = passportCanvas.toDataURL('image/png');
 
         console.log('Sending image data to server...');
@@ -212,7 +240,10 @@ document.getElementById('generatePassportBtn').addEventListener('click', async (
 
         console.log('Image processed, generating sheet...');
 
-        const sheetResponse = await fetch('/api/generate-passport-sheet', {
+        // YEH NAYI LINE - Choose endpoint based on sheet type
+        const endpoint = sheetType === 'joint' ? '/api/generate-joint-sheet' : '/api/generate-passport-sheet';
+
+        const sheetResponse = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -242,14 +273,12 @@ document.getElementById('generatePassportBtn').addEventListener('click', async (
         passportEditor.style.display = 'none';
         passportFinal.style.display = 'block';
         
-        // Show success animation with confetti
         showSuccessAnimation();
         
     } catch (error) {
         console.error('Error:', error);
         passportLoading.style.display = 'none';
         
-        // Better error messages
         let errorMessage = 'Error generating passport sheet.\n\n';
         
         if (error.message.includes('Server error')) {
@@ -321,6 +350,8 @@ function resetPassportMaker() {
     currentPhotoWidth = 1.2;
     currentPhotoHeight = 1.4;
     currentBgColor = '#FFFFFF';
+    sheetType = 'normal'; // YEH NAYI LINE
+    selectSheetType('normal'); // YEH NAYI LINE
     document.getElementById('photoSizeSelect').value = '1.2,1.4';
     document.getElementById('customSizeInputs').style.display = 'none';
     document.getElementById('zoomSlider').value = 1;
@@ -339,14 +370,12 @@ function dataURItoBlob(dataURI) {
     return new Blob([ab], { type: mimeString });
 }
 
-// Confetti animation functions
+// Confetti animation functions - YEH UPDATED HAI
 function showSuccessAnimation() {
     const overlay = document.getElementById('successOverlay');
     
-    // Clear previous confetti
     overlay.innerHTML = '';
     
-    // Create confetti pieces
     const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'orange', 'teal'];
     for (let i = 0; i < 50; i++) {
         const confetti = document.createElement('div');
@@ -357,14 +386,17 @@ function showSuccessAnimation() {
         overlay.appendChild(confetti);
     }
     
-    // Create success box
+    // YEH UPDATED - Dynamic text based on sheet type
+    const photoCount = sheetType === 'joint' ? 8 : 12;
+    const sheetName = sheetType === 'joint' ? 'Joint Photo' : 'Passport Photo';
+    
     const successBox = document.createElement('div');
     successBox.className = 'success-box';
     successBox.innerHTML = `
-        <div class="success-emoji">🎉</div>
-        <h2 class="success-title">Passport Photo Ready!</h2>
+        <div class="success-emoji">${sheetType === 'joint' ? '👥' : '🎉'}</div>
+        <h2 class="success-title">${sheetName} Sheet Ready!</h2>
         <p class="success-message">
-            Your 4" x 6" sheet with 12 passport photos<br>
+            Your 4" x 6" sheet with ${photoCount} photos<br>
             (${currentPhotoWidth}" x ${currentPhotoHeight}" each at 300 DPI) is ready!
         </p>
         <button class="success-btn" onclick="closeSuccessOverlay()">
@@ -373,10 +405,8 @@ function showSuccessAnimation() {
     `;
     overlay.appendChild(successBox);
     
-    // Show overlay
     overlay.classList.add('active');
     
-    // Auto-close after 5 seconds
     setTimeout(() => {
         closeSuccessOverlay();
     }, 5000);
