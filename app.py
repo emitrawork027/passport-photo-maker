@@ -484,13 +484,6 @@ def contact_form():
 def health():
     return jsonify({'status': 'healthy'}), 200
 
-@app.route('/robots.txt')
-def robots():
-    return '''User-agent: *
-Allow: /
-Sitemap: https://passport-photo-maker-4.onrender.com/sitemap.xml
-''', 200, {'Content-Type': 'text/plain'}
-
 @app.route('/sitemap.xml')
 def sitemap():
     from datetime import datetime
