@@ -1,21 +1,23 @@
 from flask import Flask, render_template, request, send_file, jsonify
 from flask_cors import CORS
-from PIL import Image, ImageFilter, ImageChops
+from PIL import Image
 import io
 import base64
 import os
 import atexit
 import shutil
 from werkzeug.utils import secure_filename
-
+import requests
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for API calls
+CORS(app)
+
+# Remove.bg API Configuration
+REMOVEBG_API_KEY = 'wur8bps17aG47SXUxygcPura'
 
 # Security Headers
 @app.after_request
 def set_security_headers(response):
-    """Set security headers for all responses"""
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -41,18 +43,15 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'webp'}
 
-# Environment variables
 PORT = int(os.environ.get('PORT', 5000))
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Create uploads folder
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 def cleanup_uploads():
-    """Clean uploads folder on shutdown"""
     if os.path.exists(app.config['UPLOAD_FOLDER']):
         try:
             shutil.rmtree(app.config['UPLOAD_FOLDER'])
@@ -78,85 +77,7 @@ def contact():
 def about():
     return render_template('about.html')
 
-@app.route('/api/remove-background', methods=['POST'])
-def remove_background():
-    """
-    Simple background removal using PIL only
-    Works on any hosting - no special dependencies
-    """
-    try:
-        if 'image' not in request.files:
-            return jsonify({'error': 'No image provided'}), 400
-        
-        file = request.files['image']
-        quality = request.form.get('quality', 'high')
-        
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
-        
-        if file and allowed_file(file.filename):
-            print(f"Processing image: {file.filename}")
-            
-            # Open image
-            img = Image.open(file.stream).convert('RGBA')
-            
-            # Simple method: detect edges and create mask
-            # Convert to grayscale for processing
-            gray = img.convert('L')
-            
-            # Find edges
-            edges = gray.filter(ImageFilter.FIND_EDGES)
-            edges = edges.filter(ImageFilter.SMOOTH_MORE)
-            
-            # Enhance contrast
-            edges = ImageChops.invert(edges)
-            
-            # Threshold to create mask
-            threshold = 128
-            mask = edges.point(lambda x: 255 if x > threshold else 0, mode='L')
-            
-            # Clean up mask
-            mask = mask.filter(ImageFilter.MinFilter(3))
-            mask = mask.filter(ImageFilter.MaxFilter(3))
-            mask = mask.filter(ImageFilter.GaussianBlur(2))
-            
-            # Apply mask to original image
-            img.putalpha(mask)
-            
-            # Apply quality settings
-            buffered = io.BytesIO()
-            
-            if quality == 'high':
-                img.save(buffered, format="PNG", optimize=False)
-            elif quality == 'medium':
-                img = img.resize(
-                    (int(img.width * 0.75), int(img.height * 0.75)), 
-                    Image.LANCZOS
-                )
-                img.save(buffered, format="PNG", optimize=True)
-            else:  # low
-                img = img.resize(
-                    (int(img.width * 0.5), int(img.height * 0.5)), 
-                    Image.LANCZOS
-                )
-                img.save(buffered, format="PNG", optimize=True)
-            
-            output_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-            
-            print("Background removal successful!")
-            
-            return jsonify({
-                'success': True,
-                'image': f'data:image/png;base64,{output_base64}'
-            })
-        
-        return jsonify({'error': 'Invalid file type'}), 400
-    
-    except Exception as e:
-        print(f"Error in remove_background: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+# [PASTE THE REMOVE-BACKGROUND FUNCTION FROM ABOVE HERE]
 
 @app.route('/api/process-passport', methods=['POST'])
 def process_passport():
@@ -205,18 +126,15 @@ def generate_passport_sheet():
         img_bytes = base64.b64decode(image_data)
         passport_photo = Image.open(io.BytesIO(img_bytes))
         
-        # Passport dimensions at 300 DPI
-        passport_width = int(1.2 * 300)  # 360 pixels
-        passport_height = int(1.4 * 300)  # 420 pixels
+        passport_width = int(1.2 * 300)
+        passport_height = int(1.4 * 300)
         
         passport_photo = passport_photo.resize((passport_width, passport_height), Image.LANCZOS)
         
-        # Create 4x6 inch sheet at 300 DPI
-        sheet_width = int(4 * 300)  # 1200 pixels
-        sheet_height = int(6 * 300)  # 1800 pixels
+        sheet_width = int(4 * 300)
+        sheet_height = int(6 * 300)
         sheet = Image.new('RGB', (sheet_width, sheet_height), 'white')
         
-        # 12 photos layout: 3 columns x 4 rows
         margin = 20
         spacing_x = (sheet_width - (3 * passport_width) - (2 * margin)) // 4
         spacing_y = (sheet_height - (4 * passport_height) - (2 * margin)) // 5
@@ -233,7 +151,6 @@ def generate_passport_sheet():
             if count >= 12:
                 break
         
-        # Save with quality settings
         buffered = io.BytesIO()
         if format_type == 'jpeg':
             if quality == 'high':
@@ -264,12 +181,10 @@ def contact_form():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Health check endpoint for Render
 @app.route('/health')
 def health():
     return jsonify({'status': 'healthy'}), 200
 
-# Robots.txt for SEO
 @app.route('/robots.txt')
 def robots():
     return '''User-agent: *
@@ -277,7 +192,6 @@ Allow: /
 Sitemap: https://passport-photo-maker-4.onrender.com/sitemap.xml
 ''', 200, {'Content-Type': 'text/plain'}
 
-# Sitemap for SEO
 @app.route('/sitemap.xml')
 def sitemap():
     pages = [
@@ -301,7 +215,6 @@ def sitemap():
     
     return sitemap_xml, 200, {'Content-Type': 'application/xml'}
 
-# Error handlers
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
