@@ -1,37 +1,40 @@
 from flask import Flask, render_template, request, send_file, jsonify
 from flask_cors import CORS
-# from rembg import remove  # ✅ Commented out - not available in free tier
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 import io
 import base64
 import os
 import atexit
 import shutil
 from werkzeug.utils import secure_filename
-
+import cv2
+import mediapipe as mp
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for API calls
 
+# Initialize MediaPipe Selfie Segmentation (Lazy loading)
+mp_selfie_segmentation = mp.solutions.selfie_segmentation
+segmentation_model = None
+
+def get_segmentation_model():
+    """Initialize segmentation model on first use"""
+    global segmentation_model
+    if segmentation_model is None:
+        print("Initializing background removal AI model...")
+        segmentation_model = mp_selfie_segmentation.SelfieSegmentation(model_selection=1)
+        print("AI model loaded successfully!")
+    return segmentation_model
 
 # Security Headers
 @app.after_request
 def set_security_headers(response):
     """Set security headers for all responses"""
-    
-    # Prevent clickjacking attacks
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    
-    # Enable XSS filter
     response.headers['X-XSS-Protection'] = '1; mode=block'
-    
-    # Prevent MIME type sniffing
     response.headers['X-Content-Type-Options'] = 'nosniff'
-    
-    # Referrer Policy
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
-    
-    # Content Security Policy (Fixed - removed markdown links)
     response.headers['Content-Security-Policy'] = (
         "default-src 'self' https://cdn.jsdelivr.net; "
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com; "
@@ -40,38 +43,28 @@ def set_security_headers(response):
         "font-src 'self' data:; "
         "connect-src 'self' https://cdn.jsdelivr.net;"
     )
-    
-    # Permissions Policy (formerly Feature Policy)
     response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
-    
-    # Remove or modify server header
     response.headers['Server'] = 'SecureServer'
     
-    # Strict Transport Security (HTTPS only)
     if request.is_secure:
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     
     return response
-
 
 # Configuration
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'webp'}
 
-
 # Environment variables
 PORT = int(os.environ.get('PORT', 5000))
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-
 # Create uploads folder
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
 
 def cleanup_uploads():
     """Clean uploads folder on shutdown"""
@@ -82,36 +75,30 @@ def cleanup_uploads():
         except:
             pass
 
-
 atexit.register(cleanup_uploads)
-
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
 @app.route('/passport-maker')
 def passport_maker():
     return render_template('passport_maker.html')
-
 
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
 
-
 @app.route('/about')
 def about():
     return render_template('about.html')
 
-
 @app.route('/api/remove-background', methods=['POST'])
 def remove_background():
     """
-    Background removal endpoint
-    Note: AI-based background removal requires heavy libraries (rembg)
-    which need more than 512MB RAM. This is a placeholder for demonstration.
+    Custom AI Background Removal API using MediaPipe
+    Works on free tier (512MB RAM)
+    No external dependencies
     """
     try:
         if 'image' not in request.files:
@@ -124,14 +111,46 @@ def remove_background():
             return jsonify({'error': 'No selected file'}), 400
         
         if file and allowed_file(file.filename):
-            input_image = file.read()
+            print(f"Processing image: {file.filename}")
             
-            # Open image
-            img = Image.open(io.BytesIO(input_image))
+            # Read image
+            image_data = file.read()
+            nparr = np.frombuffer(image_data, np.uint8)
+            image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             
-            # Convert to RGBA for transparency support
-            if img.mode != 'RGBA':
-                img = img.convert('RGBA')
+            if image is None:
+                return jsonify({'error': 'Failed to read image'}), 400
+            
+            # Convert BGR to RGB
+            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            
+            # Get segmentation model
+            segmenter = get_segmentation_model()
+            
+            # Process the image
+            print("Running AI model...")
+            results = segmenter.process(image_rgb)
+            
+            # Get segmentation mask
+            mask = results.segmentation_mask
+            
+            # Threshold and clean up mask
+            mask = (mask > 0.5).astype(np.uint8) * 255
+            
+            # Apply morphological operations to clean mask
+            kernel = np.ones((3, 3), np.uint8)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+            
+            # Smooth edges
+            mask = cv2.GaussianBlur(mask, (5, 5), 0)
+            
+            # Create RGBA image
+            image_rgba = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2RGBA)
+            image_rgba[:, :, 3] = mask
+            
+            # Convert to PIL Image
+            img = Image.fromarray(image_rgba)
             
             # Apply quality settings
             buffered = io.BytesIO()
@@ -147,18 +166,20 @@ def remove_background():
             
             output_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
             
+            print("Background removal successful!")
+            
             return jsonify({
                 'success': True,
-                'image': f'data:image/png;base64,{output_base64}',
-                'message': 'Note: AI background removal requires upgraded hosting plan. Currently returning processed image.'
+                'image': f'data:image/png;base64,{output_base64}'
             })
         
         return jsonify({'error': 'Invalid file type'}), 400
     
     except Exception as e:
         print(f"Error in remove_background: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/api/process-passport', methods=['POST'])
 def process_passport():
@@ -192,7 +213,6 @@ def process_passport():
     except Exception as e:
         print(f"Error in process_passport: {str(e)}")
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/api/generate-passport-sheet', methods=['POST'])
 def generate_passport_sheet():
@@ -259,22 +279,18 @@ def generate_passport_sheet():
         print(f"Error in generate_passport_sheet: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-
 @app.route('/api/contact', methods=['POST'])
 def contact_form():
     try:
         data = request.get_json()
-        # Here you can add email sending logic or save to database
         return jsonify({'success': True, 'message': 'Message sent successfully!'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 # Health check endpoint for Render
 @app.route('/health')
 def health():
     return jsonify({'status': 'healthy'}), 200
-
 
 # Robots.txt for SEO
 @app.route('/robots.txt')
@@ -283,7 +299,6 @@ def robots():
 Allow: /
 Sitemap: https://passport-photo-maker-4.onrender.com/sitemap.xml
 ''', 200, {'Content-Type': 'text/plain'}
-
 
 # Sitemap for SEO
 @app.route('/sitemap.xml')
@@ -309,17 +324,14 @@ def sitemap():
     
     return sitemap_xml, 200, {'Content-Type': 'application/xml'}
 
-
 # Error handlers
 @app.errorhandler(404)
 def not_found(error):
-    return render_template('404.html'), 404
-
+    return jsonify({'error': 'Not found'}), 404
 
 @app.errorhandler(500)
 def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=DEBUG, host='0.0.0.0', port=PORT)
