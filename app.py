@@ -1,31 +1,18 @@
 from flask import Flask, render_template, request, send_file, jsonify
 from flask_cors import CORS
-from PIL import Image
+from PIL import Image, ImageFilter
 import io
 import base64
 import os
 import atexit
 import shutil
 from werkzeug.utils import secure_filename
-import cv2
-import mediapipe as mp
 import numpy as np
+from scipy import ndimage
+from skimage import color, filters
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for API calls
-
-# Initialize MediaPipe Selfie Segmentation (Lazy loading)
-mp_selfie_segmentation = mp.solutions.selfie_segmentation
-segmentation_model = None
-
-def get_segmentation_model():
-    """Initialize segmentation model on first use"""
-    global segmentation_model
-    if segmentation_model is None:
-        print("Initializing background removal AI model...")
-        segmentation_model = mp_selfie_segmentation.SelfieSegmentation(model_selection=1)
-        print("AI model loaded successfully!")
-    return segmentation_model
 
 # Security Headers
 @app.after_request
@@ -96,9 +83,9 @@ def about():
 @app.route('/api/remove-background', methods=['POST'])
 def remove_background():
     """
-    Custom AI Background Removal API using MediaPipe
-    Works on free tier (512MB RAM)
-    No external dependencies
+    Background removal using edge detection and color segmentation
+    Works on Python 3.13 without MediaPipe/OpenCV
+    Free tier compatible (512MB RAM)
     """
     try:
         if 'image' not in request.files:
@@ -113,56 +100,88 @@ def remove_background():
         if file and allowed_file(file.filename):
             print(f"Processing image: {file.filename}")
             
-            # Read image
-            image_data = file.read()
-            nparr = np.frombuffer(image_data, np.uint8)
-            image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            # Open image
+            img = Image.open(file.stream).convert('RGB')
+            img_array = np.array(img) / 255.0  # Normalize to 0-1
             
-            if image is None:
-                return jsonify({'error': 'Failed to read image'}), 400
+            # Convert to LAB color space for better segmentation
+            img_lab = color.rgb2lab(img_array)
             
-            # Convert BGR to RGB
-            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            # Use edge detection
+            gray = color.rgb2gray(img_array)
+            edges = filters.sobel(gray)
             
-            # Get segmentation model
-            segmenter = get_segmentation_model()
+            # Threshold edges
+            edge_mask = edges > 0.05
             
-            # Process the image
-            print("Running AI model...")
-            results = segmenter.process(image_rgb)
+            # Sample background from corners
+            h, w = img_array.shape[:2]
+            corner_size = min(20, h // 10, w // 10)  # Adaptive corner size
             
-            # Get segmentation mask
-            mask = results.segmentation_mask
+            # Get corner samples
+            corners = [
+                img_lab[:corner_size, :corner_size],  # Top-left
+                img_lab[:corner_size, -corner_size:],  # Top-right
+                img_lab[-corner_size:, :corner_size],  # Bottom-left
+                img_lab[-corner_size:, -corner_size:]  # Bottom-right
+            ]
             
-            # Threshold and clean up mask
-            mask = (mask > 0.5).astype(np.uint8) * 255
+            # Calculate background color (median of corners)
+            bg_lab = np.mean([np.mean(corner.reshape(-1, 3), axis=0) for corner in corners], axis=0)
             
-            # Apply morphological operations to clean mask
-            kernel = np.ones((3, 3), np.uint8)
-            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+            # Calculate distance from background color
+            diff = np.sqrt(np.sum((img_lab - bg_lab) ** 2, axis=2))
             
-            # Smooth edges
-            mask = cv2.GaussianBlur(mask, (5, 5), 0)
+            # Normalize difference
+            diff_norm = (diff - diff.min()) / (diff.max() - diff.min() + 1e-8)
+            
+            # Create mask with adaptive threshold
+            threshold = 0.2  # Adjust for more/less aggressive removal
+            mask = diff_norm > threshold
+            
+            # Combine with edge detection to preserve subject
+            mask = np.logical_and(mask, ~edge_mask)
+            
+            # Clean up mask with morphological operations
+            mask = ndimage.binary_fill_holes(mask)
+            mask = ndimage.binary_opening(mask, iterations=2)
+            mask = ndimage.binary_closing(mask, iterations=3)
+            
+            # Find largest connected component (assumed to be subject)
+            labeled, num_features = ndimage.label(mask)
+            if num_features > 0:
+                sizes = ndimage.sum(mask, labeled, range(num_features + 1))
+                mask = (labeled == np.argmax(sizes))
+            
+            # Smooth edges with Gaussian blur
+            mask_float = mask.astype(float)
+            mask_float = ndimage.gaussian_filter(mask_float, sigma=3)
+            
+            # Convert mask to 0-255
+            alpha_channel = (mask_float * 255).astype(np.uint8)
             
             # Create RGBA image
-            image_rgba = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2RGBA)
-            image_rgba[:, :, 3] = mask
-            
-            # Convert to PIL Image
-            img = Image.fromarray(image_rgba)
+            img_rgb = (img_array * 255).astype(np.uint8)
+            img_rgba = np.dstack([img_rgb, alpha_channel])
+            result = Image.fromarray(img_rgba, 'RGBA')
             
             # Apply quality settings
             buffered = io.BytesIO()
             
             if quality == 'high':
-                img.save(buffered, format="PNG", optimize=False)
+                result.save(buffered, format="PNG", optimize=False)
             elif quality == 'medium':
-                img = img.resize((int(img.width * 0.75), int(img.height * 0.75)), Image.LANCZOS)
-                img.save(buffered, format="PNG", optimize=True)
+                result = result.resize(
+                    (int(result.width * 0.75), int(result.height * 0.75)), 
+                    Image.LANCZOS
+                )
+                result.save(buffered, format="PNG", optimize=True)
             else:  # low
-                img = img.resize((int(img.width * 0.5), int(img.height * 0.5)), Image.LANCZOS)
-                img.save(buffered, format="PNG", optimize=True)
+                result = result.resize(
+                    (int(result.width * 0.5), int(result.height * 0.5)), 
+                    Image.LANCZOS
+                )
+                result.save(buffered, format="PNG", optimize=True)
             
             output_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
             
